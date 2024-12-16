@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Orakel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Cyber-Orakel</h1>
+    <form id="fortune-form">
+        <label for="zodiac">Zodiac Sign:</label>
+        <select id="zodiac" name="zodiac">
+            <option value="hacker">Hacker</option>
+            <option value="script kiddie">Script Kiddie</option>
+            <option value="cyber warrior">Cyber Warrior</option>
+            <option value="code ninja">Code Ninja</option>
+            <option value="data miner">Data Miner</option>
+            <option value="crypto enthusiast">Crypto Enthusiast</option>
+            <option value="network guru">Network Guru</option>
+            <option value="security expert">Security Expert</option>
+        </select>
+        <br><br>
+        <label for="sentiment">Sentiment:</label>
+        <input type="range" id="sentiment" name="sentiment" min="1" max="10">
+        <p id="sentiment-text">Neutral</p>
+        <br><br>
+        <button type="submit">Get Fortune</button>
+    </form>
+    <p id="fortune-result"></p>
+
+    <script>
+        const serverUrl = 'http://localhost:8000';
+        const sentimentStrings = [
+            "Dire", "Very Bad", "Bad", "Poor", "Below Average",
+            "Average", "Above Average", "Good", "Very Good", "Outstanding"
+        ];
+
+        document.getElementById('sentiment').addEventListener('input', function() {
+            const sentimentValue = this.value;
+            document.getElementById('sentiment-text').innerText = sentimentStrings[sentimentValue - 1];
+        });
+
+        document.getElementById('fortune-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const zodiac = document.getElementById('zodiac').value;
+            const sentiment = document.getElementById('sentiment-text').innerText.toLowerCase();
+            const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac}&sentiment=${sentiment}`);
+            const data = await response.json();
+            document.getElementById('fortune-result').innerText = data.fortune;
+        });
+    </script>
+</body>
+</html>
