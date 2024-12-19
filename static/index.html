@@ -3,52 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber-Orakel</title>
+    <title>Cyber Orakel</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Cyber-Orakel</h1>
-    <form id="fortune-form">
-        <label for="zodiac">Zodiac Sign:</label>
-        <select id="zodiac" name="zodiac">
-            <option value="hacker">Hacker</option>
-            <option value="script kiddie">Script Kiddie</option>
-            <option value="cyber warrior">Cyber Warrior</option>
-            <option value="code ninja">Code Ninja</option>
-            <option value="data miner">Data Miner</option>
-            <option value="crypto enthusiast">Crypto Enthusiast</option>
-            <option value="network guru">Network Guru</option>
-            <option value="security expert">Security Expert</option>
-        </select>
-        <br><br>
-        <label for="sentiment">Sentiment:</label>
-        <input type="range" id="sentiment" name="sentiment" min="1" max="10">
-        <p id="sentiment-text">Neutral</p>
-        <br><br>
-        <button type="submit">Get Fortune</button>
-    </form>
-    <p id="fortune-result"></p>
+    <div class="logo">
+        <img src="logo.png" alt="Cyber Orakel Logo">
+    </div>
+    <div class="container">
+        <h1 class="question">
+            Was ist dein Cyber-Sternzeichen?
+        </h1>
+        <div class="grid" id="step-1">
+            <button class="button">Cyber-Krieger</button>
+            <button class="button">Wissensanarcho</button>
+            <button class="button">Einhorn</button>
+            <button class="button">Cryptogeek</button>
+            <button class="button">Codegläubig</button>
+            <button class="button">Schwurbler</button>
+            <button class="button">Retrohacker</button>
+            <button class="button">Datenelch</button>
+            <button class="button">Tschunky</button>
+        </div>
+        <div id="loading" class="hidden">
+            <p>
+                Bitte warten...
+            </p>
+        </div>
+         <div id="result" class="hidden">
+            <h2 class="answer">
+                Die Sterne sagen:
+            </h2>
+            <p id="fortune-result"></p>
+             <button id="restart">Neu starten</button>
+        </div>
+    </div>
 
-    <script>
-        const serverUrl = 'http://localhost:8000';
-        const sentimentStrings = [
-            "Dire", "Very Bad", "Bad", "Poor", "Below Average",
-            "Average", "Above Average", "Good", "Very Good", "Outstanding"
-        ];
+<script>
+    const serverUrl = 'http://localhost:8000';
 
-        document.getElementById('sentiment').addEventListener('input', function() {
-            const sentimentValue = this.value;
-            document.getElementById('sentiment-text').innerText = sentimentStrings[sentimentValue - 1];
-        });
+    document.querySelectorAll('.button').forEach(button => {
+        button.addEventListener('click', async function() {
+            const zodiac = this.innerText;
+            const sentiment = 'neutral'; // You can adjust this as needed
 
-        document.getElementById('fortune-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const zodiac = document.getElementById('zodiac').value;
-            const sentiment = document.getElementById('sentiment-text').innerText.toLowerCase();
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
             const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac}&sentiment=${sentiment}`);
             const data = await response.json();
+
             document.getElementById('fortune-result').innerText = data.fortune;
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
         });
-    </script>
+    });
+
+    document.getElementById('restart').addEventListener('click', function() {
+        document.getElementById('result').classList.add('hidden');
+        document.getElementById('step-1').classList.remove('hidden');
+    });
+</script>
 </body>
 </html>

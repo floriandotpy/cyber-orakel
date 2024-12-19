@@ -50,7 +50,7 @@ def fortune(zodiac: Optional[str] = None, sentiment: Optional[str] = None):
     # Generate a fortune cookie text based on the parameters
     fortune_text = generate_fortune(zodiac, sentiment)
 
-    read_out_loud(fortune_text)
+    # read_out_loud(fortune_text)
 
     return {"fortune": fortune_text}
 
