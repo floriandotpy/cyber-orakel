@@ -1,0 +1,1 @@
+chromium-browser --kiosk URL --noerrdialogs --disable-infobars
