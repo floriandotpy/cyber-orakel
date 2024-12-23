@@ -1,21 +1,20 @@
+from dataclasses import dataclass
 from typing import Optional
 
-import pygame
 import uvicorn
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from gtts import gTTS
 from langchain_ollama import ChatOllama
 from starlette.responses import FileResponse
+
 from cyber_orakel.print import print_receipt
 
 
+@dataclass
 class Settings:
-    def __init__(self, enable_printer: bool = True, enable_tts: bool = False):
-        self.enable_printer = enable_printer
-        self.enable_tts = enable_tts
+    enable_printer: bool = True
 
 
 class CyberOracleServer:
@@ -34,15 +33,6 @@ class CyberOracleServer:
             allow_headers=["*"],
         )
 
-    def read_out_loud(self, text: str, lang: str = "de") -> str:
-        tts = gTTS(text=text, lang=lang, slow=False)
-        tts.save("speech.mp3")
-
-        # play message
-        pygame.mixer.init()
-        pygame.mixer.music.load("../speech.mp3")
-        pygame.mixer.music.play()
-
     def generate_fortune(self, zodiac: str, sentiment: str, num_lines: int = 2, language: str = "German") -> str:
         prompt = f"""You are a fortune teller in a cyberpunk story.
         Write a fortune cookie message for the cyber zodiac "{zodiac}"
@@ -51,9 +41,6 @@ class CyberOracleServer:
 
         llm = ChatOllama(model="gemma2:2b")
         msg = llm.invoke(prompt)
-
-        if self.settings.enable_tts:
-            self.read_out_loud(msg.content)
 
         return msg.content
 
@@ -83,7 +70,7 @@ class CyberOracleServer:
         uvicorn.run(self.app, host="0.0.0.0", port=8000)
 
 
-def run_server(enable_printer: bool = True, enable_tts: bool = False):
-    settings = Settings(enable_printer=enable_printer, enable_tts=enable_tts)
+def run_server(enable_printer: bool = True):
+    settings = Settings(enable_printer=enable_printer)
     server = CyberOracleServer(settings)
     server.run()
