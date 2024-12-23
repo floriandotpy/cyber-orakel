@@ -9,11 +9,13 @@ from fastapi.staticfiles import StaticFiles
 from gtts import gTTS
 from langchain_ollama import ChatOllama
 from starlette.responses import FileResponse
+from cyber_orakel.print import print_receipt
 
 
 class Settings:
-    def __init__(self, enable_printer: bool = True):
+    def __init__(self, enable_printer: bool = True, enable_tts: bool = False):
         self.enable_printer = enable_printer
+        self.enable_tts = enable_tts
 
 
 class CyberOracleServer:
@@ -50,7 +52,7 @@ class CyberOracleServer:
         llm = ChatOllama(model="gemma2:2b")
         msg = llm.invoke(prompt)
 
-        if self.settings.enable_printer:
+        if self.settings.enable_tts:
             self.read_out_loud(msg.content)
 
         return msg.content
@@ -62,7 +64,10 @@ class CyberOracleServer:
                 raise HTTPException(status_code=400, detail="Missing parameters")
 
             # Generate a fortune cookie text based on the parameters
-            fortune_text = self.generate_fortune(zodiac, sentiment, enable_printer=self.settings.enable_printer)
+            fortune_text = self.generate_fortune(zodiac, sentiment)
+
+            if self.settings.enable_printer:
+                print_receipt(fortune_text)
 
             return {"fortune": fortune_text}
 
@@ -78,7 +83,7 @@ class CyberOracleServer:
         uvicorn.run(self.app, host="0.0.0.0", port=8000)
 
 
-def run_server(enable_printer: bool = True):
-    settings = Settings(enable_printer=enable_printer)
+def run_server(enable_printer: bool = True, enable_tts: bool = False):
+    settings = Settings(enable_printer=enable_printer, enable_tts=enable_tts)
     server = CyberOracleServer(settings)
     server.run()
