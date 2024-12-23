@@ -25,8 +25,17 @@ pip install -r requirements.txt
 
 # Run
 
+Without printer support:
+
 ```commandline
-python server.py
+python main.py --noprinter
 ```
+
+With printer support:
+    
+```commandline
+python main.py
+```
+
 
 Then open your browser and go to `http://localhost:8000/`
