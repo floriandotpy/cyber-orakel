@@ -17,6 +17,53 @@ class Settings:
     enable_printer: bool = True
 
 
+@dataclass
+class CyberZodiac:
+    key: str
+    display_name: str
+    prompt_snippet: str
+
+
+ZODIAC_SIGNS: list[CyberZodiac] = [
+    CyberZodiac(
+        key="cyber_krieger",
+        display_name="Cyber-Krieger",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="wissensanarcho",
+        display_name="Wissensanarcho",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="einhorn",
+        display_name="Einhorn",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="cryptogeek",
+        display_name="Cryptogeek",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="codeglaeubig",
+        display_name="Codegläubig",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="schwurbler",
+        display_name="Schwurbler",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="retrohacker",
+        display_name="Retrohacker",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="datenelch",
+        display_name="Datenelch",
+        prompt_snippet=""),
+    CyberZodiac(
+        key="tschunky",
+        display_name="Tschunky",
+        prompt_snippet="")
+]
+
+
 class CyberOracleServer:
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -57,6 +104,10 @@ class CyberOracleServer:
                 print_receipt(fortune_text)
 
             return {"fortune": fortune_text}
+
+        @self.app.get("/zodiacs")
+        def get_zodiacs():
+            return [{"key": zodiac.key, "display_name": zodiac.display_name} for zodiac in ZODIAC_SIGNS]
 
         @self.app.get("/")
         def read_root():

@@ -15,15 +15,7 @@
             Was ist dein Cyber-Sternzeichen?
         </h1>
         <div class="grid" id="step-1">
-            <button class="button">Cyber-Krieger</button>
-            <button class="button">Wissensanarcho</button>
-            <button class="button">Einhorn</button>
-            <button class="button">Cryptogeek</button>
-            <button class="button">Codegläubig</button>
-            <button class="button">Schwurbler</button>
-            <button class="button">Retrohacker</button>
-            <button class="button">Datenelch</button>
-            <button class="button">Tschunky</button>
+            <!-- Buttons will be dynamically added here -->
         </div>
         <div id="loading" class="hidden">
             <p>
@@ -42,27 +34,44 @@
 <script>
     const serverUrl = 'http://localhost:8000';
 
-    document.querySelectorAll('.button').forEach(button => {
-        button.addEventListener('click', async function() {
-            const zodiac = this.innerText;
-            const sentiment = 'neutral'; // You can adjust this as needed
+    async function fetchZodiacs() {
+        const response = await fetch(`${serverUrl}/zodiacs`);
+        const zodiacs = await response.json();
+        return zodiacs;
+    }
 
-            document.getElementById('step-1').classList.add('hidden');
-            document.getElementById('loading').classList.remove('hidden');
+    function renderButtons(zodiacs) {
+        const container = document.getElementById('step-1');
+        container.innerHTML = ''; // Clear any existing buttons
 
-            const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac}&sentiment=${sentiment}`);
-            const data = await response.json();
+        zodiacs.forEach(zodiac => {
+            const button = document.createElement('button');
+            button.className = 'button';
+            button.innerText = zodiac.display_name;
+            button.addEventListener('click', async function() {
+                const sentiment = 'neutral'; // You can adjust this as needed
 
-            document.getElementById('fortune-result').innerText = data.fortune;
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('result').classList.remove('hidden');
+                document.getElementById('step-1').classList.add('hidden');
+                document.getElementById('loading').classList.remove('hidden');
+
+                const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`);
+                const data = await response.json();
+
+                document.getElementById('fortune-result').innerText = data.fortune;
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('result').classList.remove('hidden');
+            });
+            container.appendChild(button);
         });
-    });
+    }
 
     document.getElementById('restart').addEventListener('click', function() {
         document.getElementById('result').classList.add('hidden');
         document.getElementById('step-1').classList.remove('hidden');
     });
+
+    // Fetch zodiacs and render buttons on page load
+    fetchZodiacs().then(renderButtons);
 </script>
 </body>
 </html>
