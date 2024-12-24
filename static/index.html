@@ -7,29 +7,29 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div class="logo">
-        <img src="static/logo.png" alt="Cyber Orakel Logo">
+<div class="logo">
+    <img src="static/logo.png" alt="Cyber Orakel Logo">
+</div>
+<div class="container">
+    <h1 class="question">
+        Was ist dein Cyber-Sternzeichen?
+    </h1>
+    <div class="grid" id="step-1">
+        <!-- Buttons will be dynamically added here -->
     </div>
-    <div class="container">
-        <h1 class="question">
-            Was ist dein Cyber-Sternzeichen?
-        </h1>
-        <div class="grid" id="step-1">
-            <!-- Buttons will be dynamically added here -->
-        </div>
-        <div id="loading" class="hidden">
-            <p>
-                Bitte warten...
-            </p>
-        </div>
-         <div id="result" class="hidden">
-            <h2 class="answer">
-                Die Sterne sagen:
-            </h2>
-            <p id="fortune-result"></p>
-             <button id="restart">Neu starten</button>
-        </div>
+    <div id="loading" class="hidden">
+        <p>
+            Bitte warten...
+        </p>
     </div>
+    <div id="result" class="hidden">
+        <h2 class="answer">
+            Die Sterne sagen:
+        </h2>
+        <p id="fortune-result"></p>
+        <button id="restart">Neu starten</button>
+    </div>
+</div>
 
 <script>
     const serverUrl = 'http://localhost:8000';
@@ -49,7 +49,7 @@
             button.className = 'button';
             button.innerText = zodiac.display_name;
             button.addEventListener('click', async function() {
-                const sentiment = 'neutral'; // You can adjust this as needed
+                const sentiment = 'random';
 
                 document.getElementById('step-1').classList.add('hidden');
                 document.getElementById('loading').classList.remove('hidden');
