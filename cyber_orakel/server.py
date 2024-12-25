@@ -48,8 +48,7 @@ class CyberOracleServer:
             fortune_text = generate_fortune(zodiac, sentiment)
 
             if self.settings.enable_printer:
-                print(zodiac.key, zodiac.display_name)
-                print_receipt(fortune_text)
+                print_receipt(fortune_text, zodiac)
 
             return {"fortune": fortune_text}
 
