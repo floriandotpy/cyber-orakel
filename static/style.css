@@ -77,3 +77,19 @@ body {
 .hidden {
     display: none;
 }
+
+.fortune-result {
+    font-size: 1.75em;
+    line-height: 2.25em;
+    width: 70%;
+    margin: 0 auto;
+    font-family: monospace;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.margin-top-small {
+    margin-top: 20px;
+}

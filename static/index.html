@@ -12,7 +12,7 @@
         <img src="static/logo.png" alt="Cyber Orakel Logo">
     </div>
     <div class="container">
-        <div id="step-1" class="hidden">
+        <div id="step-1">
             <h1 class="question">
                 Was ist dein Cyber-Sternzeichen?
             </h1>
@@ -20,7 +20,7 @@
                 <!-- Buttons will be dynamically added here -->
             </div>
         </div>
-        <div id="loading">
+        <div id="loading" class="hidden">
             <h1 class="question">
                 Das Orakel cybert, bitte warten
             </h1>
@@ -29,11 +29,15 @@
             </div>
         </div>
         <div id="result" class="hidden">
-            <h2 class="answer">
+            <h1 class="question">
                 Die Sterne sagen:
-            </h2>
-            <p id="fortune-result"></p>
-            <button id="restart" class="button" style="margin-top: 5%;">Neu starten</button>
+            </h1>
+            <p id="fortune-result" class="fortune-result">
+                <!-- Fortune will be dynamically added here-->
+            </p>
+            <div class="text-center">
+                <button id="restart" class="button margin-top-small">Neu starten</button>
+            </div>
         </div>
     </div>
     <script>
