@@ -87,9 +87,9 @@ def print_receipt(message, zodiac):
         printer.text("\n")
 
         # Print intro text
-        printer.text(format_text("Grüße: " + str(zodiac) + "!", MAX_WIDTH, center=True) + "\n")
-        printer.text(format_text("Deine heutige Prophezeiung lautet:", MAX_WIDTH, center=True) + "\n")
-        printer.text("-" * MAX_WIDTH + "\n")
+        #printer.text(format_text("Grüße: " + str(zodiac) + "!", MAX_WIDTH, center=True) + "\n")
+        #printer.text(format_text("Deine heutige Prophezeiung lautet:", MAX_WIDTH, center=True) + "\n")
+        #printer.text("-" * MAX_WIDTH + "\n")
 
         # Print message
         printer.text("\n")
@@ -98,9 +98,9 @@ def print_receipt(message, zodiac):
 
         # FOOTER
         # Print footer text
-        printer.text("-" * MAX_WIDTH + "\n")
-        footer_text = "Have a lovely congress, nerd."
-        printer.text(format_text(footer_text, MAX_WIDTH, center=True) + "\n")
+        #printer.text("-" * MAX_WIDTH + "\n")
+        #footer_text = "Have a lovely congress, nerd."
+        #printer.text(format_text(footer_text, MAX_WIDTH, center=True) + "\n")
         printer.text("\n")
         # Print footer image
         image = Image.open(image_path_38c3)
@@ -115,6 +115,9 @@ def print_receipt(message, zodiac):
     except Exception as e:
         print(f"Error: {e}")
 
+    finally:
+        if printer:
+            printer.close()
 
 # Script can be run from the command line
 if __name__ == "__main__":
