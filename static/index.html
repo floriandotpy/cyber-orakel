@@ -61,6 +61,7 @@
             step_2_completed = false;
             document.getElementById('step-1').classList.remove('hidden');
             document.getElementById('result').classList.add('hidden');
+            fetchEntropyWords().then(renderEntropyWords);
         }
 
         async function fetchZodiacs() {

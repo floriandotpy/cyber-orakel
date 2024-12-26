@@ -58,7 +58,6 @@ class CyberOracleServer:
         @self.app.get("/entropy_words")
         def get_entropy_words():
             entropy_words = [
-                "Olaf Scholz",
                 "Klimaschutz",
                 "Corona",
                 "Impfpflicht",
@@ -133,7 +132,7 @@ class CyberOracleServer:
                 "Linux",
                 "Löten mit Kolben",
                 "Löten ohne Kolben",
-                "löten",
+                "Löten",
                 "Netzpolitik",
                 "Neuland",
                 "Obama",
