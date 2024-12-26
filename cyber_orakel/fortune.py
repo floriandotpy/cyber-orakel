@@ -139,7 +139,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
 ]
 
 
-async def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German"):
+def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German") -> str:
     zodiac = next((z for z in ZODIAC_SIGNS if z.key == zodiac_key), None)
     if not zodiac:
         # invalid zodiac sign, pick a random one
@@ -156,8 +156,8 @@ async def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, 
 
     chat = ChatOllama(model="gemma2:2b")
 
-    async for chunk in chat.astream(prompt):
-        yield str(chunk.content)
+    response = chat.invoke(prompt)
+    return response.content
 
 
 def generate_many_fortunes():

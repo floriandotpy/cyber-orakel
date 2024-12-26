@@ -8,7 +8,6 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
-from starlette.responses import StreamingResponse
 
 from cyber_orakel.fortune import SENTIMENTS
 from cyber_orakel.fortune import ZODIAC_SIGNS
@@ -39,17 +38,18 @@ class CyberOracleServer:
 
     def setup_routes(self):
         @self.app.get("/fortune")
-        async def fortune(zodiac: Optional[str] = None, sentiment: Optional[str] = None):
+        def fortune(zodiac: Optional[str] = None, sentiment: Optional[str] = None):
             if not zodiac or not sentiment:
                 raise HTTPException(status_code=400, detail="Missing parameters")
 
             sentiment = random.choice(SENTIMENTS) if sentiment == "random" else sentiment
 
+            fortune_text = generate_fortune(zodiac, sentiment)
+
             if self.settings.enable_printer:
-                fortune_text = ''.join([chunk async for chunk in generate_fortune(zodiac, sentiment)])
                 print_receipt(fortune_text, zodiac)
 
-            return StreamingResponse(generate_fortune(zodiac, sentiment), media_type="text/event-stream")
+            return {"fortune": fortune_text}
 
         @self.app.get("/zodiacs")
         def get_zodiacs():
