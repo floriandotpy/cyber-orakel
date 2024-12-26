@@ -1,5 +1,4 @@
 import random
-from asyncio import CancelledError
 from dataclasses import dataclass
 from typing import Optional
 
@@ -46,18 +45,11 @@ class CyberOracleServer:
 
             sentiment = random.choice(SENTIMENTS) if sentiment == "random" else sentiment
 
-            async def fortune_generator():
-                try:
-                    async for chunk in generate_fortune(zodiac, sentiment):
-                        yield chunk
-                except CancelledError:
-                    print("Client disconnected")
-
             if self.settings.enable_printer:
                 fortune_text = ''.join([chunk async for chunk in generate_fortune(zodiac, sentiment)])
                 print_receipt(fortune_text, zodiac)
 
-            return StreamingResponse(fortune_generator(), media_type="text/plain")
+            return StreamingResponse(generate_fortune(zodiac, sentiment), media_type="text/event-stream")
 
         @self.app.get("/zodiacs")
         def get_zodiacs():
