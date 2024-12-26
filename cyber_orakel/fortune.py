@@ -133,6 +133,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Tschunk ist die Antwort
         - 48 Tschunk pro Stunde
         - Tschunk o'clock
+        - Ohne Tschunk kein Leben
+        - Ein Leben ohne Tschunk ist möglich, aber sinnlos
         """)
 ]
 
