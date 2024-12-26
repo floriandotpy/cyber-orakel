@@ -104,7 +104,7 @@ def print_receipt(message, zodiac):
         printer.text("\n")
         # Print footer image
         image = Image.open(image_path_38c3)
-        image = image.resize((250, int(image.height * (250 / image.width))), Image.Resampling.LANCZOS)
+        image = image.resize((150, int(image.height * (150 / image.width))), Image.Resampling.LANCZOS)
         image = center_image(image, 384)
         printer.image(image)
 
