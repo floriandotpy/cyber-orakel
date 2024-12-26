@@ -1,4 +1,5 @@
 import random
+from asyncio import CancelledError
 from dataclasses import dataclass
 from typing import Optional
 
@@ -8,11 +9,12 @@ from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
+from starlette.responses import StreamingResponse
 
 from cyber_orakel.fortune import SENTIMENTS
 from cyber_orakel.fortune import ZODIAC_SIGNS
 from cyber_orakel.fortune import generate_fortune
-from cyber_orakel.print import print_receipt
+from cyber_orakel.testprint import print_receipt
 
 
 @dataclass
@@ -38,19 +40,24 @@ class CyberOracleServer:
 
     def setup_routes(self):
         @self.app.get("/fortune")
-        def fortune(zodiac: Optional[str] = None, sentiment: Optional[str] = None):
+        async def fortune(zodiac: Optional[str] = None, sentiment: Optional[str] = None):
             if not zodiac or not sentiment:
                 raise HTTPException(status_code=400, detail="Missing parameters")
 
             sentiment = random.choice(SENTIMENTS) if sentiment == "random" else sentiment
 
-            # Generate a fortune cookie text based on the parameters
-            fortune_text = generate_fortune(zodiac, sentiment)
+            async def fortune_generator():
+                try:
+                    async for chunk in generate_fortune(zodiac, sentiment):
+                        yield chunk
+                except CancelledError:
+                    print("Client disconnected")
 
             if self.settings.enable_printer:
-                print_receipt(fortune_text, zodiac)
+                fortune_text = ''.join([chunk async for chunk in generate_fortune(zodiac, sentiment)])
+                print_receipt(fortune_text)
 
-            return {"fortune": fortune_text}
+            return StreamingResponse(fortune_generator(), media_type="text/plain")
 
         @self.app.get("/zodiacs")
         def get_zodiacs():

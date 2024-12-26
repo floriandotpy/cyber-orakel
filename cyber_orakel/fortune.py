@@ -139,7 +139,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
 ]
 
 
-def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German") -> str:
+async def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German"):
     zodiac = next((z for z in ZODIAC_SIGNS if z.key == zodiac_key), None)
     if not zodiac:
         # invalid zodiac sign, pick a random one
@@ -154,10 +154,10 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     Use them as inspiration for the message but don't just copy them verbatim: 
     {zodiac.prompt_snippet}"""
 
-    llm = ChatOllama(model="gemma2:2b")
-    msg = llm.invoke(prompt)
+    chat = ChatOllama(model="gemma2:2b")
 
-    return msg.content
+    async for chunk in chat.astream(prompt):
+        yield str(chunk.content)
 
 
 def generate_many_fortunes():
