@@ -8,77 +8,76 @@
     <link rel="stylesheet" href="static/loading.css">
 </head>
 <body>
-<div class="logo">
-    <img src="static/logo.png" alt="Cyber Orakel Logo">
-</div>
-<div class="container">
-    <div id="step-1" class="hidden">
-        <h1 class="question">
-            Was ist dein Cyber-Sternzeichen?
-        </h1>
-        <div id="step-1-content" class="grid">
-            <!-- Buttons will be dynamically added here -->
+    <div class="logo">
+        <img src="static/logo.png" alt="Cyber Orakel Logo">
+    </div>
+    <div class="container">
+        <div id="step-1" class="hidden">
+            <h1 class="question">
+                Was ist dein Cyber-Sternzeichen?
+            </h1>
+            <div id="step-1-content" class="grid">
+                <!-- Buttons will be dynamically added here -->
+            </div>
+        </div>
+        <div id="loading">
+            <h1 class="question">
+                Das Orakel cybert, bitte warten
+            </h1>
+            <div class="loading-animation">
+                CYBER IN PROGRESS...
+            </div>
+        </div>
+        <div id="result" class="hidden">
+            <h2 class="answer">
+                Die Sterne sagen:
+            </h2>
+            <p id="fortune-result"></p>
+            <button id="restart" class="button" style="margin-top: 5%;">Neu starten</button>
         </div>
     </div>
-    <div id="loading">
-        <h1 class="question">
-            Das Orakel cybert, bitte warten
-        </h1>
-        <div class="loading-animation">
-            CYBER IN PROGRESS...
-        </div>
-</body>
-</div>
-<div id="result" class="hidden">
-    <h2 class="answer">
-        Die Sterne sagen:
-    </h2>
-    <p id="fortune-result"></p>
-    <button id="restart" class="button" style="margin-top: 5%;">Neu starten</button>
-</div>
+    <script>
+        const serverUrl = 'http://localhost:8000';
 
-<script>
-    const serverUrl = 'http://localhost:8000';
+        async function fetchZodiacs() {
+            const response = await fetch(`${serverUrl}/zodiacs`);
+            const zodiacs = await response.json();
+            return zodiacs;
+        }
 
-    async function fetchZodiacs() {
-        const response = await fetch(`${serverUrl}/zodiacs`);
-        const zodiacs = await response.json();
-        return zodiacs;
-    }
+        function renderButtons(zodiacs) {
+            const container = document.getElementById('step-1');
+            const content = document.getElementById('step-1-content');
+            content.innerHTML = ''; // Clear any existing buttons
 
-    function renderButtons(zodiacs) {
-        const container = document.getElementById('step-1');
-        const content = document.getElementById('step-1-content');
-        content.innerHTML = ''; // Clear any existing buttons
+            zodiacs.forEach(zodiac => {
+                const button = document.createElement('button');
+                button.className = 'button';
+                button.innerText = zodiac.display_name;
+                button.addEventListener('click', async function() {
+                    const sentiment = 'random';
 
-        zodiacs.forEach(zodiac => {
-            const button = document.createElement('button');
-            button.className = 'button';
-            button.innerText = zodiac.display_name;
-            button.addEventListener('click', async function() {
-                const sentiment = 'random';
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('loading').classList.remove('hidden');
 
-                document.getElementById('step-1').classList.add('hidden');
-                document.getElementById('loading').classList.remove('hidden');
+                    const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`);
+                    const data = await response.json();
 
-                const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`);
-                const data = await response.json();
-
-                document.getElementById('fortune-result').innerText = data.fortune;
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('result').classList.remove('hidden');
+                    document.getElementById('fortune-result').innerText = data.fortune;
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('result').classList.remove('hidden');
+                });
+                content.appendChild(button);
             });
-            content.appendChild(button);
+        }
+
+        document.getElementById('restart').addEventListener('click', function() {
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('step-1').classList.remove('hidden');
         });
-    }
 
-    document.getElementById('restart').addEventListener('click', function() {
-        document.getElementById('result').classList.add('hidden');
-        document.getElementById('step-1').classList.remove('hidden');
-    });
-
-    // Fetch zodiacs and render buttons on page load
-    fetchZodiacs().then(renderButtons);
-</script>
+        // Fetch zodiacs and render buttons on page load
+        fetchZodiacs().then(renderButtons);
+    </script>
 </body>
 </html>
