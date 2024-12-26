@@ -20,6 +20,17 @@
                 <!-- Buttons will be dynamically added here -->
             </div>
         </div>
+        <div id="step-2" class="hidden">
+            <h1 class="question">
+                Hinterlasse Entropie für das Orakel nach dir
+            </h1>
+            <div id="step-2-content" class="grid">
+                <!-- Select boxes will be dynamically added here -->
+            </div>
+            <div class="text-center">
+                <button id="submit_entropy" class="button margin-top-small">Entropie speichern</button>
+            </div>
+        </div>
         <div id="loading" class="hidden">
             <h1 class="question">
                 Das Orakel cybert, bitte warten
@@ -36,12 +47,20 @@
                 <!-- Fortune will be dynamically added here-->
             </p>
             <div class="text-center">
-                <button id="restart" class="button margin-top-small hidden">Neu starten</button>
+                <button id="restart" class="button margin-top-small">Neu starten</button>
             </div>
         </div>
     </div>
     <script>
         const serverUrl = 'http://localhost:8000';
+        let fortune_text = '';
+        let step_2_completed = false;
+        function restart() {
+            fortune_text = '';
+            step_2_completed = false;
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+        }
 
         async function fetchZodiacs() {
             const response = await fetch(`${serverUrl}/zodiacs`);
@@ -62,30 +81,98 @@
                     const sentiment = 'random';
 
                     const loadingEl = document.getElementById('loading');
+                    const step2El = document.getElementById('step-2');
 
                     document.getElementById('step-1').classList.add('hidden');
-                    loadingEl.classList.remove('hidden');
+                    step2El.classList.remove('hidden');
 
                     const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`);
                     const data = await response.json();
-                    document.getElementById('fortune-result').innerText = data.fortune;
-                    console.log(data.fortune);
-                    loadingEl.classList.add('hidden');
-                    document.getElementById('result').classList.remove('hidden');
+                    fortune_text = data.fortune;
 
-                    document.getElementById('restart').classList.remove('hidden');
+                    displayFortuneIfAvailableAndStepTwoCompleted();
+                    //document.getElementById('fortune-result').innerText = data.fortune;
+                    //console.log(data.fortune);
+                    //loadingEl.classList.add('hidden');
+                    //document.getElementById('result').classList.remove('hidden');
+                    //document.getElementById('restart').classList.remove('hidden');
+
                 });
                 content.appendChild(button);
             });
         }
 
+        function displayFortuneIfAvailableAndStepTwoCompleted() {
+            if (fortune_text && step_2_completed) {
+                const loadingEl = document.getElementById('loading');
+                const resultEl = document.getElementById('result');
+                const restartEl = document.getElementById('restart');
+                document.getElementById('fortune-result').innerText = fortune_text;
+                loadingEl.classList.add('hidden');
+                resultEl.classList.remove('hidden');
+                restartEl.classList.remove('hidden');
+            }
+
+        }
+
+        async function fetchEntropyWords() {
+            const response = await fetch(`${serverUrl}/entropy_words`);
+            const words = await response.json();
+            return words;
+        }
+
+        function renderEntropyWords(words) {
+            const content = document.getElementById('step-2-content');
+            content.innerHTML = ''; // Clear any existing content
+
+            words.forEach(word => {
+                const label = document.createElement('label');
+                label.className = 'checkbox-label';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = word;
+
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(word));
+                content.appendChild(label);
+            });
+
+            // add button action
+            document.getElementById('submit_entropy').addEventListener('click', async function() {
+                const selectedWords = Array.from(content.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                const response = await fetch(`${serverUrl}/entropy`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ words: selectedWords })
+                });
+                const data = await response.json();
+                console.log(data);
+
+                step_2_completed = true;
+
+                // hide step-2 container and show loading
+                document.getElementById('step-2').classList.add('hidden');
+                document.getElementById('loading').classList.remove('hidden');
+
+                displayFortuneIfAvailableAndStepTwoCompleted();
+
+            });
+        }
+
         document.getElementById('restart').addEventListener('click', function() {
-            document.getElementById('result').classList.add('hidden');
-            document.getElementById('step-1').classList.remove('hidden');
+            restart();
         });
 
         // Fetch zodiacs and render buttons on page load
         fetchZodiacs().then(renderButtons);
+
+        // Fetch entropy words and render checkboxes on page load
+        fetchEntropyWords().then(renderEntropyWords);
     </script>
 </body>
 </html>

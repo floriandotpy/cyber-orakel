@@ -55,10 +55,118 @@ class CyberOracleServer:
         def get_zodiacs():
             return [{"key": zodiac.key, "display_name": zodiac.display_name} for zodiac in ZODIAC_SIGNS]
 
+        @self.app.get("/entropy_words")
+        def get_entropy_words():
+            entropy_words = [
+                "Olaf Scholz",
+                "Klimaschutz",
+                "Corona",
+                "Impfpflicht",
+                "Bällebad",
+                "Lötkolben",
+                "5G",
+                "Assembly",
+                "Engel",
+                "Arduino",
+                "Android",
+                "Blinkenlights",
+                "Bundestrojaner",
+                "Bundeswehr",
+                "CCC",
+                "Chaos",
+                "Chaosdorf",
+                "Chaosradio",
+                "Chaoswest",
+                "Chaospost",
+                "Cocktail",
+                "Congress",
+                "Saal 1",
+                "3D-Druck",
+                "3D-Drucker",
+                "5G",
+                "KI",
+                "Aluburka",
+                "Android",
+                "Angela Merkel",
+                "Arduino",
+                "Assembly",
+                "Backup",
+                "Bällebad",
+                "Blinkenlights",
+                "Bundestrojaner",
+                "Chaos",
+                "Club",
+                "Code",
+                "Computer",
+                "Congress",
+                "Cyber",
+                "Cyberwar",
+                "Das geht nicht in Saal 1",
+                "Datenschutz",
+                "Datensicherheit",
+                "De-Mail",
+                "DECT",
+                "Demoszene",
+                "DSGVO",
+                "Engel",
+                "EU",
+                "Europaparlament",
+                "Fahrplan",
+                "FPGA",
+                "Freie Software",
+                "Freifunk",
+                "Glitzer",
+                "GNU",
+                "GSM",
+                "Hacken",
+                "Hacker Jeopardy",
+                "Hacker",
+                "Hackerethik",
+                "hacktivism",
+                "Haeckse",
+                "Heaven",
+                "Illegal instructions",
+                "Informationsfreiheitgesetz",
+                "Internet",
+                "Katzenohren",
+                "Kryptographie",
+                "Linux",
+                "Löten mit Kolben",
+                "Löten ohne Kolben",
+                "löten",
+                "Netzpolitik",
+                "Neuland",
+                "Obama",
+                "Olaf Scholz",
+                "Open Source",
+                "Raspberry Pi",
+                "Saal 1",
+                "Späti",
+                "Staatstrojaner",
+                "Tschunk",
+                "Überwachung",
+                "Überwachungsstaat",
+                "Ursula von der Leyen",
+                "VoC",
+                "Vorratsdatenspeicherung",
+                "Wiki",
+            ]
+
+            # pick 16 random words
+            return random.sample(entropy_words, 18)
+
+        @self.app.post("/entropy")
+        def save_entropy(data: dict):
+            print(data)
+            # TODO: store and attach entropy data to the prompt in next generation
+            return {"success": True}
+
         @self.app.get("/")
         def read_root():
             # render the index.html file
             return FileResponse("static/index.html")
+
+
 
         # Mount the static files directory
         self.app.mount("/static", StaticFiles(directory="static"), name="static")
