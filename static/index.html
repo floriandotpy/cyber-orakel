@@ -41,7 +41,7 @@
         </div>
         <div id="result" class="hidden">
             <h1 class="question">
-                Die Sterne sagen:
+                Die Sterne haben gesprochen
             </h1>
             <p id="fortune-result" class="fortune-result">
                 <!-- Fortune will be dynamically added here-->
@@ -55,6 +55,7 @@
         const serverUrl = 'http://localhost:8000';
         let fortune_text = '';
         let step_2_completed = false;
+
         function restart() {
             fortune_text = '';
             step_2_completed = false;
@@ -91,12 +92,6 @@
                     fortune_text = data.fortune;
 
                     displayFortuneIfAvailableAndStepTwoCompleted();
-                    //document.getElementById('fortune-result').innerText = data.fortune;
-                    //console.log(data.fortune);
-                    //loadingEl.classList.add('hidden');
-                    //document.getElementById('result').classList.remove('hidden');
-                    //document.getElementById('restart').classList.remove('hidden');
-
                 });
                 content.appendChild(button);
             });
@@ -107,12 +102,12 @@
                 const loadingEl = document.getElementById('loading');
                 const resultEl = document.getElementById('result');
                 const restartEl = document.getElementById('restart');
-                document.getElementById('fortune-result').innerText = fortune_text;
+                //document.getElementById('fortune-result').innerText = fortune_text;
+                document.getElementById('fortune-result').innerText = "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen."
                 loadingEl.classList.add('hidden');
                 resultEl.classList.remove('hidden');
                 restartEl.classList.remove('hidden');
             }
-
         }
 
         async function fetchEntropyWords() {
@@ -123,6 +118,9 @@
 
         function renderEntropyWords(words) {
             const content = document.getElementById('step-2-content');
+            const submitButton = document.getElementById('submit_entropy');
+            submitButton.disabled = true;
+            submitButton.innerText = 'Noch 3 auswählen';
             content.innerHTML = ''; // Clear any existing content
 
             words.forEach(word => {
@@ -133,13 +131,15 @@
                 checkbox.type = 'checkbox';
                 checkbox.value = word;
 
+                checkbox.addEventListener('change', updateSubmitButton);
+
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(word));
                 content.appendChild(label);
             });
 
             // add button action
-            document.getElementById('submit_entropy').addEventListener('click', async function() {
+            submitButton.addEventListener('click', async function() {
                 const selectedWords = Array.from(content.querySelectorAll('input[type="checkbox"]:checked'))
                     .map(checkbox => checkbox.value);
 
@@ -160,8 +160,20 @@
                 document.getElementById('loading').classList.remove('hidden');
 
                 displayFortuneIfAvailableAndStepTwoCompleted();
-
             });
+        }
+
+        function updateSubmitButton() {
+            const selectedCount = document.querySelectorAll('#step-2-content input[type="checkbox"]:checked').length;
+            const submitButton = document.getElementById('submit_entropy');
+
+            if (selectedCount >= 3) {
+                submitButton.disabled = false;
+                submitButton.innerText = 'Entropie speichern';
+            } else {
+                submitButton.disabled = true;
+                submitButton.innerText = `Noch ${3 - selectedCount} auswählen`;
+            }
         }
 
         document.getElementById('restart').addEventListener('click', function() {
