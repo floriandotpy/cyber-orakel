@@ -73,7 +73,7 @@ def center_text(text, width):
     return " " * spaces + text
 
 
-def print_receipt(message):
+def print_receipt(message, zodiac):
     try:
         printer = Usb(VENDOR_ID, PRODUCT_ID, 0, out_ep=0x03)
         printer.profile.profile_data['media']['width']['pixel'] = 384
@@ -87,7 +87,8 @@ def print_receipt(message):
         printer.text("\n")
 
         # Print intro text
-        printer.text(format_text("Deine persönliche Prophezeiung:", MAX_WIDTH, center=True) + "\n")
+        printer.text(format_text("Grüße: " + str(zodiac) + "!", MAX_WIDTH, center=True) + "\n")
+        printer.text(format_text("Deine heutige Prophezeiung lautet:", MAX_WIDTH, center=True) + "\n")
         printer.text("-" * MAX_WIDTH + "\n")
 
         # Print message

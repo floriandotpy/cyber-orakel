@@ -21,7 +21,12 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Hacking
         - Künstliche Intelligenz
         - Virtuelle Realität
-        - Cyberspace"""),
+        - Cyberspace
+        - VIM
+        - Fairydust
+        - Chaos Computer Club
+        - Chaos Communication Congress
+        """),
     CyberZodiac(
         key="wissensanarcho",
         display_name="Wissensanarcho",
@@ -35,7 +40,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Wissen ist Macht
         - Wissen teilen
         - Wissen ist frei
-"""),
+        """),
     CyberZodiac(
         key="einhorn",
         display_name="Einhorn",
@@ -49,7 +54,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Konfetti
         - Kreativität
         - Chaos ist schön
-"""),
+        """),
     CyberZodiac(
         key="cryptogeek",
         display_name="Cryptogeek",
@@ -61,6 +66,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Keysigning Party
         - GPG Key
         - https everywhere
+        - Private Daten schützen, öffentliche Daten nützen
         """),
     CyberZodiac(
         key="codeglaeubig",
@@ -70,6 +76,11 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Alles ist 1 außer der 0
         - Code ist Poesie
         - Code ist Kunst
+        - Code hat immer Recht
+        - Misstraue Autoritäten
+        - Computer können dein Leben zum Besseren verändern
+        - Der Code ist mit dir
+        - Code ist Schönheit
         """),
     CyberZodiac(
         key="schwurbler",
@@ -81,6 +92,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Globuli
         - Aluhut
         - Aluburka
+        - Verschwörungstheorie
+        - Bill Gates
         """),
     CyberZodiac(
         key="retrohacker",
@@ -93,6 +106,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Hacker Manifest
         - Funkausstellung
         - BTX
+        - Demoszene
+        - Atari
         """),
     CyberZodiac(
         key="datenelch",
@@ -104,6 +119,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Wald
         - Wald und Wiesen Internet
         - Datenautobahn
+        - Logbuch Netzpolitik
         """),
     CyberZodiac(
         key="tschunky",
@@ -115,6 +131,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Tschunk ist Leben
         - Um 3 an der Tschunk-Bar
         - Tschunk ist die Antwort
+        - 48 Tschunk pro Stunde
+        - Tschunk o'clock
         """)
 ]
 
