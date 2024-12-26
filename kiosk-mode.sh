@@ -13,4 +13,4 @@ python3 main.py &
 sleep 5
 
 # Starten Sie den Chromium-Browser im Kiosk-Modus
-chromium-browser --kiosk "http://localhost:8000" --noerrdialogs --disable-infobars
+chromium-browser --kiosk "http://localhost:8000" --noerrdialogs --disable-infobars --incognito --disable-features=TranslateUI --disable-pinch --overscroll-history-navigation=0 --hide-scrollbars --app="http://localhost:8000" --disable-infobars --no-cursor
