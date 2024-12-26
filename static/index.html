@@ -124,19 +124,31 @@
             submitButton.innerText = 'Noch 3 auswählen';
             content.innerHTML = ''; // Clear any existing content
 
-            words.forEach(word => {
-                const label = document.createElement('label');
-                label.className = 'checkbox-label';
+            words.forEach((word, index) => {
+                const checkboxId = `checkbox-${index}`; // Einzigartige ID für jede Checkbox
 
+                // Checkbox erstellen
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
+                checkbox.id = checkboxId; // ID setzen
+                checkbox.className = 'checkbox'; // Styling-Klasse
                 checkbox.value = word;
+                checkbox.addEventListener('change', updateSubmitButton); // Event-Listener
 
-                checkbox.addEventListener('change', updateSubmitButton);
+                // Label erstellen
+                const label = document.createElement('label');
+                label.className = 'select-button'; // Styling-Klasse für das Label
+                label.setAttribute('for', checkboxId); // Mit der Checkbox verbinden
+                label.textContent = word; // Text setzen
 
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(word));
-                content.appendChild(label);
+                // Wrapper erstellen und Elemente hinzufügen
+                const wrapper = document.createElement('div'); // Optionaler Wrapper
+                wrapper.style.display = 'inline-block'; // Styling für Inline-Darstellung
+                wrapper.appendChild(checkbox);
+                wrapper.appendChild(label);
+
+                // Wrapper ins DOM einfügen
+                content.appendChild(wrapper);
             });
 
             // add button action
