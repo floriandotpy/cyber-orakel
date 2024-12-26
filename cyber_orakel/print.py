@@ -11,9 +11,6 @@ PRODUCT_ID = 0x0289
 
 # Pfad zu Bildern
 
-# image_path_orakel = "/home/pablo/cyberorakel/orakel_2.jpg"
-# image_path_38c3 = "/home/pablo/cyberorakel/38c3.png"
-
 print_assets_path = Path(__file__).parent.parent / "print_assets"
 image_path_orakel = print_assets_path / "orakel_2.jpg"
 image_path_38c3 = print_assets_path / "38c3.png"

@@ -14,7 +14,7 @@ from starlette.responses import StreamingResponse
 from cyber_orakel.fortune import SENTIMENTS
 from cyber_orakel.fortune import ZODIAC_SIGNS
 from cyber_orakel.fortune import generate_fortune
-from cyber_orakel.testprint import print_receipt
+from cyber_orakel.print import print_receipt
 
 
 @dataclass
@@ -55,7 +55,7 @@ class CyberOracleServer:
 
             if self.settings.enable_printer:
                 fortune_text = ''.join([chunk async for chunk in generate_fortune(zodiac, sentiment)])
-                print_receipt(fortune_text)
+                print_receipt(fortune_text, zodiac)
 
             return StreamingResponse(fortune_generator(), media_type="text/plain")
 
