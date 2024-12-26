@@ -111,6 +111,7 @@ def print_receipt(message, zodiac):
         # Finalize print
         printer.cut()
         print("Print complete")
+        printer.close()
 
     except Exception as e:
         print(f"Error: {e}")
