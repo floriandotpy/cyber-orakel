@@ -74,8 +74,9 @@ def center_text(text, width):
 
 
 def print_receipt(message, zodiac):
+    printer = None
     try:
-        printer = Usb(VENDOR_ID, PRODUCT_ID, 0, out_ep=0x03)
+        printer = Usb(VENDOR_ID, PRODUCT_ID, {}, out_ep=0x03)
         printer.profile.profile_data['media']['width']['pixel'] = 384
 
         # Print header image
@@ -87,9 +88,9 @@ def print_receipt(message, zodiac):
         printer.text("\n")
 
         # Print intro text
-        #printer.text(format_text("Grüße: " + str(zodiac) + "!", MAX_WIDTH, center=True) + "\n")
-        #printer.text(format_text("Deine heutige Prophezeiung lautet:", MAX_WIDTH, center=True) + "\n")
-        #printer.text("-" * MAX_WIDTH + "\n")
+        # printer.text(format_text("Grüße: " + str(zodiac) + "!", MAX_WIDTH, center=True) + "\n")
+        # printer.text(format_text("Deine heutige Prophezeiung lautet:", MAX_WIDTH, center=True) + "\n")
+        # printer.text("-" * MAX_WIDTH + "\n")
 
         # Print message
         printer.text("\n")
@@ -98,9 +99,9 @@ def print_receipt(message, zodiac):
 
         # FOOTER
         # Print footer text
-        #printer.text("-" * MAX_WIDTH + "\n")
-        #footer_text = "Have a lovely congress, nerd."
-        #printer.text(format_text(footer_text, MAX_WIDTH, center=True) + "\n")
+        # printer.text("-" * MAX_WIDTH + "\n")
+        # footer_text = "Have a lovely congress, nerd."
+        # printer.text(format_text(footer_text, MAX_WIDTH, center=True) + "\n")
         printer.text("\n")
         # Print footer image
         image = Image.open(image_path_38c3)
@@ -111,14 +112,13 @@ def print_receipt(message, zodiac):
         # Finalize print
         printer.cut()
         print("Print complete")
-        printer.close()
 
     except Exception as e:
         print(f"Error: {e}")
-
     finally:
-        if printer:
+        if printer and printer.device:
             printer.close()
+
 
 # Script can be run from the command line
 if __name__ == "__main__":
