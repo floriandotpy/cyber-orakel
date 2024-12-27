@@ -71,10 +71,9 @@ body {
 
 /* Aktivierte Checkbox (checked) */
 .checkbox:checked + label {
-    border: 3px solid #FF5053; /* Rahmenfarbe ändern */
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.6); /* Glüheffekt */
+    border: 1px solid #FF5053; /* Rahmenfarbe ändern */
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.868); /* Glüheffekt */
     background: linear-gradient(145deg, #B2AAFF, #190B2F); /* Hintergrund ändern */
-    transform: scale(1.05); /* Animation: leichtes Vergrößern */
 }
 
 /* Hover-Effekt */
