@@ -165,8 +165,6 @@ class CyberOracleServer:
             # render the index.html file
             return FileResponse("static/index.html")
 
-
-
         # Mount the static files directory
         self.app.mount("/static", StaticFiles(directory="static"), name="static")
 

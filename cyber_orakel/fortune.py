@@ -1,7 +1,12 @@
 import random
+import time
 from dataclasses import dataclass
+from datetime import datetime
 
 from langchain_ollama import ChatOllama
+
+from cyber_orakel.log_db import Fortune
+from cyber_orakel.log_db import log_to_sqlite
 
 
 @dataclass
@@ -154,7 +159,19 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     Use them as inspiration for the message but don't just copy them verbatim: 
     {zodiac.prompt_snippet}"""
 
+    start_time = time.time()
     chat = ChatOllama(model="gemma2:2b")
+    duration = time.time() - start_time
+
+    fortune_obj = Fortune(
+        generation_time=datetime.now(),
+        fortune=chat.invoke(prompt).content,
+        prompt=prompt,
+        generation_duration=duration,
+        zodiac_key=zodiac_key,
+        sentiment=sentiment
+    )
+    log_to_sqlite(fortune_obj)
 
     response = chat.invoke(prompt)
     return response.content
