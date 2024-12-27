@@ -174,8 +174,8 @@ class CyberOracleServer:
                 "Wiki",
             ]
 
-            # pick 12 random words
-            return random.sample(entropy_words, 12)
+            # pick 9 random words
+            return random.sample(entropy_words, 9)
 
         @self.app.post("/entropy")
         def save_entropy(data: dict):
