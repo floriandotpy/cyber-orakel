@@ -13,6 +13,8 @@ from cyber_orakel.fortune import SENTIMENTS
 from cyber_orakel.fortune import ZODIAC_SIGNS
 from cyber_orakel.fortune import generate_fortune
 from cyber_orakel.print import print_receipt
+from mastodon import Mastodon
+import os
 
 
 @dataclass
@@ -48,6 +50,17 @@ class CyberOracleServer:
 
             if self.settings.enable_printer:
                 print_receipt(fortune_text, zodiac)
+            
+            try:
+                # push the fortune to mastodon
+                mastodon = Mastodon(
+                    access_token=os.getenv('MASTODON_ACCESS_TOKEN'),
+                    api_base_url='https://mastodon.social'
+                )
+
+                mastodon.toot(f"Die Sterne sprachen:\n{fortune_text}")
+            except Exception as e:
+                print(f"Failed to post to Mastodon: {e}")
 
             return {"fortune": fortune_text}
 
