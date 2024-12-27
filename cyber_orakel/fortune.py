@@ -1,7 +1,9 @@
+import json
 import random
 import time
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 from langchain_ollama import ChatOllama
 
@@ -144,12 +146,20 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
 ]
 
 
-def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German") -> str:
+def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, language: str = "German",
+                     include_entropy_words: bool = True) -> str:
     zodiac = next((z for z in ZODIAC_SIGNS if z.key == zodiac_key), None)
     if not zodiac:
         # invalid zodiac sign, pick a random one
         print(f"Invalid zodiac sign: {zodiac_key}, picking a random one")
         zodiac = random.choice(ZODIAC_SIGNS)
+
+    entropy_snippet = ""
+    if include_entropy_words:
+        if PATH_CURRENT_ENTROPY_JSON.exists():
+            with open(PATH_CURRENT_ENTROPY_JSON, "r") as f:
+                entropy_words = json.load(f)
+                entropy_snippet = "\n".join([f"- {word}" for word in entropy_words])
 
     prompt = f"""You are a fortune teller in a cyberpunk story.
     Write a fortune cookie message for the cyber zodiac "{zodiac.display_name}"
@@ -157,7 +167,10 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     Write in {language}. Do not explain your answer. Be short and concise. Add no special characters.
     The following terms and phrases are typical for the cyber zodiac {zodiac.display_name}. 
     Use them as inspiration for the message but don't just copy them verbatim: 
-    {zodiac.prompt_snippet}"""
+    {zodiac.prompt_snippet}\n{entropy_snippet}"""
+    # cleanup prompt: remove leading whitespace in every line and remove double line breaks
+    prompt = "\n".join([line.strip() for line in prompt.split("\n")]).replace("\n\n", "\n")
+    print(prompt)
 
     start_time = time.time()
     chat = ChatOllama(model="gemma2:2b")
@@ -188,3 +201,4 @@ def generate_many_fortunes():
 
 if __name__ == '__main__':
     generate_many_fortunes()
+PATH_CURRENT_ENTROPY_JSON = Path(__file__).parent.parent / "current_entropy.json"

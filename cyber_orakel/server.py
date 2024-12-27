@@ -1,3 +1,4 @@
+import json
 import random
 from dataclasses import dataclass
 from typing import Optional
@@ -9,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
+from cyber_orakel.fortune import PATH_CURRENT_ENTROPY_JSON
 from cyber_orakel.fortune import SENTIMENTS
 from cyber_orakel.fortune import ZODIAC_SIGNS
 from cyber_orakel.fortune import generate_fortune
@@ -179,8 +181,12 @@ class CyberOracleServer:
 
         @self.app.post("/entropy")
         def save_entropy(data: dict):
-            print(data)
-            # TODO: store and attach entropy data to the prompt in next generation
+
+            words = data.get("words")
+            with PATH_CURRENT_ENTROPY_JSON.open("w") as f:
+                json.dump(words, f)
+                print(f"Saved entropy data to file: {words}")
+
             return {"success": True}
 
         @self.app.get("/")
