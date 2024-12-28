@@ -189,9 +189,50 @@
             }
         }
 
+        let countdownInterval;
+
+        function startCountdown() {
+            let countdown = 10; // seconds
+            const restartButton = document.getElementById('restart');
+            restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
+
+            countdownInterval = setInterval(() => {
+                countdown -= 1;
+                if (countdown > 0) {
+                    restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
+                } else {
+                    clearInterval(countdownInterval);
+                    restart();
+                }
+            }, 1000);
+        }
+
+        function restart() {
+            clearInterval(countdownInterval);
+            fortune_text = '';
+            step_2_completed = false;
+            document.getElementById('step-1').classList.remove('hidden');
+            document.getElementById('result').classList.add('hidden');
+            fetchEntropyWords().then(renderEntropyWords);
+        }
+
         document.getElementById('restart').addEventListener('click', function() {
             restart();
         });
+
+        // Start the countdown when the result screen is shown
+        function displayFortuneIfAvailableAndStepTwoCompleted() {
+            if (fortune_text && step_2_completed) {
+                const loadingEl = document.getElementById('loading');
+                const resultEl = document.getElementById('result');
+                const restartEl = document.getElementById('restart');
+                document.getElementById('fortune-result').innerText = "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+                loadingEl.classList.add('hidden');
+                resultEl.classList.remove('hidden');
+                restartEl.classList.remove('hidden');
+                startCountdown();
+            }
+        }
 
         // Fetch zodiacs and render buttons on page load
         fetchZodiacs().then(renderButtons);
