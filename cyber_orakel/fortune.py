@@ -24,15 +24,19 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         key="cyber_krieger",
         display_name="Cyber-Krieger",
         prompt_snippet="""
-        - Cyber-Implantat
         - Hacking
-        - Künstliche Intelligenz
         - Virtuelle Realität
         - Cyberspace
         - VIM
         - Fairydust
         - Chaos Computer Club
         - Chaos Communication Congress
+        - Cyberdeck
+        - Cyber-Angriff
+        - Cyber-Attacke
+        - Intrusion
+        - Virus
+        - Antivirus
         """),
     CyberZodiac(
         key="wissensanarcho",
@@ -47,6 +51,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Wissen ist Macht
         - Wissen teilen
         - Wissen ist frei
+        - Creative Commons
         """),
     CyberZodiac(
         key="einhorn",
@@ -61,6 +66,11 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Konfetti
         - Kreativität
         - Chaos ist schön
+        - Lächeln
+        - Löten
+        - Lötkolben
+        - Lichterkette
+        - Blinkende Lichter
         """),
     CyberZodiac(
         key="cryptogeek",
@@ -101,6 +111,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Aluburka
         - Verschwörungstheorie
         - Bill Gates
+        - Flat earther
+        - Impfgegner
         """),
     CyberZodiac(
         key="retrohacker",
@@ -115,6 +127,8 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - BTX
         - Demoszene
         - Atari
+        - Lötkolben
+        - Löten
         """),
     CyberZodiac(
         key="datenelch",
@@ -124,9 +138,10 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Empfangs-Turbo
         - High speed Internet
         - Wald
-        - Wald und Wiesen Internet
+        - Dorf-Internet
         - Datenautobahn
         - Logbuch Netzpolitik
+        - Neuland
         """),
     CyberZodiac(
         key="tschunky",
@@ -138,7 +153,7 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Tschunk ist Leben
         - Um 3 an der Tschunk-Bar
         - Tschunk ist die Antwort
-        - 48 Tschunk pro Stunde
+        - 42 Tschunk pro Stunde
         - Tschunk o'clock
         - Ohne Tschunk kein Leben
         - Ein Leben ohne Tschunk ist möglich, aber sinnlos
