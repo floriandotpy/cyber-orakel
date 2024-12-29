@@ -1,244 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cyber Orakel</title>
-    <link rel="stylesheet" href="static/style.css">
-    <link rel="stylesheet" href="static/loading.css">
-</head>
-<body>
+    <link rel="stylesheet" href="static/style.css" />
+    <link rel="stylesheet" href="static/loading.css" />
+  </head>
+  <body>
     <div class="logo">
-        <img src="static/logo.png" alt="Cyber Orakel Logo">
+      <img src="static/logo.png" alt="Cyber Orakel Logo" />
     </div>
     <div class="container">
-        <div id="step-1">
-            <h1 class="question">
-                Was ist dein Cyber-Sternzeichen?
-            </h1>
-            <div id="step-1-content" class="grid">
-                <!-- Buttons will be dynamically added here -->
-            </div>
+      <div id="step-1">
+        <h1 class="question">Was ist dein Cyber-Sternzeichen?</h1>
+        <div id="step-1-content" class="grid">
+          <!-- Buttons will be dynamically added here -->
         </div>
-        <div id="step-2" class="hidden">
-            <h1 class="question">
-                Hinterlasse Entropie für das Orakel nach dir
-            </h1>
-            <div id="step-2-content" class="grid">
-                <!-- Select boxes will be dynamically added here -->
-            </div>
-            <div class="text-center">
-                <button id="submit_entropy" class="button margin-top-small">Entropie speichern</button>
-            </div>
+      </div>
+      <div id="step-2" class="hidden">
+        <h1 class="question">Hinterlasse Entropie für das Orakel nach dir</h1>
+        <div id="step-2-content" class="grid">
+          <!-- Select boxes will be dynamically added here -->
         </div>
-        <div id="loading" class="hidden">
-            <h1 class="question">
-                Das Orakel cybert, bitte warten
-            </h1>
-            <div class="loading-animation">
-                CYBER IN PROGRESS...
-            </div>
+        <div class="text-center">
+          <button id="submit_entropy" class="button margin-top-small">
+            Entropie speichern
+          </button>
         </div>
-        <div id="result" class="hidden">
-            <h1 class="question">
-                Die Sterne haben gesprochen
-            </h1>
-            <p id="fortune-result" class="fortune-result">
-                <!-- Fortune will be dynamically added here-->
-            </p>
-            <div class="text-center">
-                <button id="restart" class="button margin-top-small">Neu starten</button>
-            </div>
+      </div>
+      <div id="loading" class="hidden">
+        <h1 class="question">Das Orakel cybert, bitte warten</h1>
+        <div class="loading-animation">CYBER IN PROGRESS...</div>
+      </div>
+      <div id="result" class="hidden">
+        <h1 class="question">Die Sterne haben gesprochen</h1>
+        <p id="fortune-result" class="fortune-result">
+          <!-- Fortune will be dynamically added here-->
+        </p>
+        <div class="text-center">
+          <button id="restart" class="button margin-top-small">
+            Neu starten
+          </button>
         </div>
+      </div>
     </div>
     <script>
-        const serverUrl = 'http://localhost:8000';
-        let fortune_text = '';
-        let step_2_completed = false;
+      const serverUrl = "http://localhost:8000";
+      let fortune_text = "";
+      let step_2_completed = false;
 
-        function restart() {
-            fortune_text = '';
-            step_2_completed = false;
-            document.getElementById('step-1').classList.remove('hidden');
-            document.getElementById('result').classList.add('hidden');
-            fetchEntropyWords().then(renderEntropyWords);
+      function restart() {
+        fortune_text = "";
+        step_2_completed = false;
+        document.getElementById("step-1").classList.remove("hidden");
+        document.getElementById("result").classList.add("hidden");
+        fetchEntropyWords().then(renderEntropyWords);
+      }
+
+      async function fetchZodiacs() {
+        const response = await fetch(`${serverUrl}/zodiacs`);
+        const zodiacs = await response.json();
+        return zodiacs;
+      }
+
+      function renderButtons(zodiacs) {
+        const container = document.getElementById("step-1");
+        const content = document.getElementById("step-1-content");
+        content.innerHTML = ""; // Clear any existing buttons
+
+        zodiacs.forEach((zodiac) => {
+          const button = document.createElement("button");
+          button.className = "button";
+          button.innerText = zodiac.display_name;
+          button.addEventListener("click", async function () {
+            const sentiment = "random";
+
+            const loadingEl = document.getElementById("loading");
+            const step2El = document.getElementById("step-2");
+
+            document.getElementById("step-1").classList.add("hidden");
+            step2El.classList.remove("hidden");
+
+            const response = await fetch(
+              `${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`
+            );
+            const data = await response.json();
+            fortune_text = data.fortune;
+
+            displayFortuneIfAvailableAndStepTwoCompleted();
+          });
+          content.appendChild(button);
+        });
+      }
+
+      function displayFortuneIfAvailableAndStepTwoCompleted() {
+        if (fortune_text && step_2_completed) {
+          const loadingEl = document.getElementById("loading");
+          const resultEl = document.getElementById("result");
+          const restartEl = document.getElementById("restart");
+          //document.getElementById('fortune-result').innerText = fortune_text;
+          document.getElementById("fortune-result").innerText =
+            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+          loadingEl.classList.add("hidden");
+          resultEl.classList.remove("hidden");
+          restartEl.classList.remove("hidden");
         }
+      }
 
-        async function fetchZodiacs() {
-            const response = await fetch(`${serverUrl}/zodiacs`);
-            const zodiacs = await response.json();
-            return zodiacs;
-        }
+      async function fetchEntropyWords() {
+        const response = await fetch(`${serverUrl}/entropy_words`);
+        const words = await response.json();
+        return words;
+      }
 
-        function renderButtons(zodiacs) {
-            const container = document.getElementById('step-1');
-            const content = document.getElementById('step-1-content');
-            content.innerHTML = ''; // Clear any existing buttons
+      function renderEntropyWords(words) {
+        const content = document.getElementById("step-2-content");
+        const submitButton = document.getElementById("submit_entropy");
+        submitButton.disabled = true;
+        submitButton.innerText = "Noch 3 auswählen";
+        content.innerHTML = ""; // Clear any existing content
 
-            zodiacs.forEach(zodiac => {
-                const button = document.createElement('button');
-                button.className = 'button';
-                button.innerText = zodiac.display_name;
-                button.addEventListener('click', async function() {
-                    const sentiment = 'random';
+        words.forEach((word, index) => {
+          const checkboxId = `checkbox-${index}`; // Einzigartige ID für jede Checkbox
 
-                    const loadingEl = document.getElementById('loading');
-                    const step2El = document.getElementById('step-2');
+          // Checkbox erstellen
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = checkboxId; // ID setzen
+          checkbox.className = "checkbox"; // Styling-Klasse
+          checkbox.value = word;
+          checkbox.addEventListener("change", updateSubmitButton); // Event-Listener
 
-                    document.getElementById('step-1').classList.add('hidden');
-                    step2El.classList.remove('hidden');
+          // Label erstellen
+          const label = document.createElement("label");
+          label.className = "select-button"; // Styling-Klasse für das Label
+          label.setAttribute("for", checkboxId); // Mit der Checkbox verbinden
+          label.textContent = word; // Text setzen
 
-                    const response = await fetch(`${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`);
-                    const data = await response.json();
-                    fortune_text = data.fortune;
+          // Wrapper erstellen und Elemente hinzufügen
+          const wrapper = document.createElement("div"); // Optionaler Wrapper
+          wrapper.style.display = "inline-block"; // Styling für Inline-Darstellung
+          wrapper.appendChild(checkbox);
+          wrapper.appendChild(label);
 
-                    displayFortuneIfAvailableAndStepTwoCompleted();
-                });
-                content.appendChild(button);
-            });
-        }
-
-        function displayFortuneIfAvailableAndStepTwoCompleted() {
-            if (fortune_text && step_2_completed) {
-                const loadingEl = document.getElementById('loading');
-                const resultEl = document.getElementById('result');
-                const restartEl = document.getElementById('restart');
-                //document.getElementById('fortune-result').innerText = fortune_text;
-                document.getElementById('fortune-result').innerText = "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen."
-                loadingEl.classList.add('hidden');
-                resultEl.classList.remove('hidden');
-                restartEl.classList.remove('hidden');
-            }
-        }
-
-        async function fetchEntropyWords() {
-            const response = await fetch(`${serverUrl}/entropy_words`);
-            const words = await response.json();
-            return words;
-        }
-
-        function renderEntropyWords(words) {
-            const content = document.getElementById('step-2-content');
-            const submitButton = document.getElementById('submit_entropy');
-            submitButton.disabled = true;
-            submitButton.innerText = 'Noch 3 auswählen';
-            content.innerHTML = ''; // Clear any existing content
-
-            words.forEach((word, index) => {
-                const checkboxId = `checkbox-${index}`; // Einzigartige ID für jede Checkbox
-
-                // Checkbox erstellen
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = checkboxId; // ID setzen
-                checkbox.className = 'checkbox'; // Styling-Klasse
-                checkbox.value = word;
-                checkbox.addEventListener('change', updateSubmitButton); // Event-Listener
-
-                // Label erstellen
-                const label = document.createElement('label');
-                label.className = 'select-button'; // Styling-Klasse für das Label
-                label.setAttribute('for', checkboxId); // Mit der Checkbox verbinden
-                label.textContent = word; // Text setzen
-
-                // Wrapper erstellen und Elemente hinzufügen
-                const wrapper = document.createElement('div'); // Optionaler Wrapper
-                wrapper.style.display = 'inline-block'; // Styling für Inline-Darstellung
-                wrapper.appendChild(checkbox);
-                wrapper.appendChild(label);
-
-                // Wrapper ins DOM einfügen
-                content.appendChild(wrapper);
-            });
-
-            // add button action
-            submitButton.addEventListener('click', async function() {
-                const selectedWords = Array.from(content.querySelectorAll('input[type="checkbox"]:checked'))
-                    .map(checkbox => checkbox.value);
-
-                const response = await fetch(`${serverUrl}/entropy`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ words: selectedWords })
-                });
-                const data = await response.json();
-                console.log(data);
-
-                step_2_completed = true;
-
-                // hide step-2 container and show loading
-                document.getElementById('step-2').classList.add('hidden');
-                document.getElementById('loading').classList.remove('hidden');
-
-                displayFortuneIfAvailableAndStepTwoCompleted();
-            });
-        }
-
-        function updateSubmitButton() {
-            const selectedCount = document.querySelectorAll('#step-2-content input[type="checkbox"]:checked').length;
-            const submitButton = document.getElementById('submit_entropy');
-
-            if (selectedCount >= 3) {
-                submitButton.disabled = false;
-                submitButton.innerText = 'Entropie speichern';
-            } else {
-                submitButton.disabled = true;
-                submitButton.innerText = `Noch ${3 - selectedCount} auswählen`;
-            }
-        }
-
-        let countdownInterval;
-
-        function startCountdown() {
-            let countdown = 10; // seconds
-            const restartButton = document.getElementById('restart');
-            restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
-
-            countdownInterval = setInterval(() => {
-                countdown -= 1;
-                if (countdown > 0) {
-                    restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
-                } else {
-                    clearInterval(countdownInterval);
-                    restart();
-                }
-            }, 1000);
-        }
-
-        function restart() {
-            clearInterval(countdownInterval);
-            fortune_text = '';
-            step_2_completed = false;
-            document.getElementById('step-1').classList.remove('hidden');
-            document.getElementById('result').classList.add('hidden');
-            fetchEntropyWords().then(renderEntropyWords);
-        }
-
-        document.getElementById('restart').addEventListener('click', function() {
-            restart();
+          // Wrapper ins DOM einfügen
+          content.appendChild(wrapper);
         });
 
-        // Start the countdown when the result screen is shown
-        function displayFortuneIfAvailableAndStepTwoCompleted() {
-            if (fortune_text && step_2_completed) {
-                const loadingEl = document.getElementById('loading');
-                const resultEl = document.getElementById('result');
-                const restartEl = document.getElementById('restart');
-                document.getElementById('fortune-result').innerText = "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
-                loadingEl.classList.add('hidden');
-                resultEl.classList.remove('hidden');
-                restartEl.classList.remove('hidden');
-                startCountdown();
-            }
+        // add button action
+        submitButton.removeEventListener("click", handleButtonClick);
+        submitButton.addEventListener("click", handleButtonClick);
+      }
+
+      async function handleButtonClick() {
+        const content = document.getElementById("step-2-content");
+        const selectedWords = Array.from(
+          content.querySelectorAll('input[type="checkbox"]:checked')
+        ).map((checkbox) => checkbox.value);
+
+        const response = await fetch(`${serverUrl}/entropy`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ words: selectedWords }),
+        });
+        const data = await response.json();
+        console.log(data);
+
+        step_2_completed = true;
+
+        // hide step-2 container and show loading
+        document.getElementById("step-2").classList.add("hidden");
+        document.getElementById("loading").classList.remove("hidden");
+
+        displayFortuneIfAvailableAndStepTwoCompleted();
+      }
+
+      function updateSubmitButton() {
+        const selectedCount = document.querySelectorAll(
+          '#step-2-content input[type="checkbox"]:checked'
+        ).length;
+        const submitButton = document.getElementById("submit_entropy");
+
+        if (selectedCount >= 3) {
+          submitButton.disabled = false;
+          submitButton.innerText = "Entropie speichern";
+        } else {
+          submitButton.disabled = true;
+          submitButton.innerText = `Noch ${3 - selectedCount} auswählen`;
         }
+      }
 
-        // Fetch zodiacs and render buttons on page load
-        fetchZodiacs().then(renderButtons);
+      let countdownInterval;
 
-        // Fetch entropy words and render checkboxes on page load
+      function startCountdown() {
+        let countdown = 10; // seconds
+        const restartButton = document.getElementById("restart");
+        restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
+
+        countdownInterval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            restartButton.innerText = `Neu starten (${countdown} Sekunden)`;
+          } else {
+            clearInterval(countdownInterval);
+            restart();
+          }
+        }, 1000);
+      }
+
+      function restart() {
+        clearInterval(countdownInterval);
+        fortune_text = "";
+        step_2_completed = false;
+        document.getElementById("step-1").classList.remove("hidden");
+        document.getElementById("result").classList.add("hidden");
         fetchEntropyWords().then(renderEntropyWords);
+      }
+
+      document.getElementById("restart").addEventListener("click", function () {
+        restart();
+      });
+
+      // Start the countdown when the result screen is shown
+      function displayFortuneIfAvailableAndStepTwoCompleted() {
+        if (fortune_text && step_2_completed) {
+          const loadingEl = document.getElementById("loading");
+          const resultEl = document.getElementById("result");
+          const restartEl = document.getElementById("restart");
+          document.getElementById("fortune-result").innerText =
+            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+          loadingEl.classList.add("hidden");
+          resultEl.classList.remove("hidden");
+          restartEl.classList.remove("hidden");
+          startCountdown();
+        }
+      }
+
+      // Fetch zodiacs and render buttons on page load
+      fetchZodiacs().then(renderButtons);
+
+      // Fetch entropy words and render checkboxes on page load
+      fetchEntropyWords().then(renderEntropyWords);
     </script>
-</body>
+  </body>
 </html>
