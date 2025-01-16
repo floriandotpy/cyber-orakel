@@ -1,6 +1,18 @@
 # cyber-orakel
 
-Erfahre deine Zukunft per Cyber-Keks
+> Erfahre deine Zukunft per Cyber-Keks.
+
+This is a local-only project to generate cyber-style fortune cookie messages using a small LLM and a primitive web-based UI.
+
+Ideally, you follow our example and deploy it on a RaspberryPi with a connected thermo printer.
+
+## Preview of the final project
+
+Blog post about the project: https://casualcoding.com/building-a-cyber-oracle-using-a-local-llm-on-a-raspberry-pi-5/
+
+![cyber-orakel-photo-1](https://github.com/user-attachments/assets/ab9660e5-86b5-4ce3-8e68-d49f98d47ad8)
+
+![cyber-orakel-photo-3](https://github.com/user-attachments/assets/ecaa91f9-e60c-4aac-9268-43b0b56a0027)
 
 # Setup
 
@@ -38,7 +50,6 @@ With printer support:
 python main.py
 ```
 
-
 Then open your browser and go to `http://localhost:8000/`
 
 ## Raspberry Pi setup
@@ -57,8 +68,6 @@ Host cyberorakel
 ```
 
 ### Run
-Credentials in company 1P:
-https://start.1password.com/open/i?a=2Q5JDWR65RBWLPXINOB3QLIQXM&v=dumjuqu3tedivnkyt2yqrnvfzy&i=ywv3vddvivldz6iiuhdhhd4kna&h=theyconsultinggmbh.1password.eu
 
 ```commandline
 ssh cyberorakel
