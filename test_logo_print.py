@@ -32,10 +32,10 @@ def center_image(image, printer_width):
 
 
 def test_variant_1(printer):
-    """Original method - direct convert to 1-bit"""
-    print("\n=== VARIANT 1: Direct convert to 1-bit ===")
-    printer.text("\n--- VARIANT 1: Direct 1-bit ---\n")
-    
+    """Original method - direct convert to 1-bit (BROKEN - for comparison)"""
+    print("\n=== VARIANT 1: Direct convert to 1-bit (BROKEN) ===")
+    printer.text("\n--- VARIANT 1: Direct 1-bit (BROKEN) ---\n")
+
     image = Image.open(image_path)
     image = image.convert("1")
     image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
@@ -45,11 +45,18 @@ def test_variant_1(printer):
 
 
 def test_variant_2(printer):
-    """Grayscale first, then 1-bit with dithering"""
-    print("\n=== VARIANT 2: Grayscale + Floyd-Steinberg dithering ===")
-    printer.text("\n--- VARIANT 2: Dithering ---\n")
-    
+    """Remove transparency with WHITE background"""
+    print("\n=== VARIANT 2: White background + Dithering ===")
+    printer.text("\n--- VARIANT 2: White BG ---\n")
+
     image = Image.open(image_path)
+
+    # Handle transparency by adding WHITE background
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, (255, 255, 255))  # White background
+        background.paste(image, mask=image.split()[3])  # Use alpha channel as mask
+        image = background
+
     image = image.convert("L")
     image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
     image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)
@@ -59,19 +66,26 @@ def test_variant_2(printer):
 
 
 def test_variant_3(printer):
-    """Brightness + Contrast enhancement"""
-    print("\n=== VARIANT 3: Brightness +20%, Contrast +30% ===")
-    printer.text("\n--- VARIANT 3: Bright+Contrast ---\n")
-    
+    """White background + Brightness + Contrast"""
+    print("\n=== VARIANT 3: White BG + Brightness +20%, Contrast +30% ===")
+    printer.text("\n--- VARIANT 3: White BG + Enhance ---\n")
+
     image = Image.open(image_path)
+
+    # Handle transparency with WHITE background
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, (255, 255, 255))
+        background.paste(image, mask=image.split()[3])
+        image = background
+
     image = image.convert("L")
-    
+
     # Increase brightness and contrast
     enhancer = ImageEnhance.Brightness(image)
     image = enhancer.enhance(1.2)  # 20% brighter
     enhancer = ImageEnhance.Contrast(image)
     image = enhancer.enhance(1.3)  # 30% more contrast
-    
+
     image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
     image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)
     image = center_image(image, 384)
@@ -80,19 +94,26 @@ def test_variant_3(printer):
 
 
 def test_variant_4(printer):
-    """Higher brightness"""
-    print("\n=== VARIANT 4: Brightness +50%, Contrast +50% ===")
-    printer.text("\n--- VARIANT 4: Extra Bright ---\n")
-    
+    """White background + Higher brightness"""
+    print("\n=== VARIANT 4: White BG + Brightness +50%, Contrast +50% ===")
+    printer.text("\n--- VARIANT 4: White BG + Extra Bright ---\n")
+
     image = Image.open(image_path)
+
+    # Handle transparency with WHITE background
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, (255, 255, 255))
+        background.paste(image, mask=image.split()[3])
+        image = background
+
     image = image.convert("L")
-    
+
     # More aggressive enhancement
     enhancer = ImageEnhance.Brightness(image)
     image = enhancer.enhance(1.5)  # 50% brighter
     enhancer = ImageEnhance.Contrast(image)
     image = enhancer.enhance(1.5)  # 50% more contrast
-    
+
     image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
     image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)
     image = center_image(image, 384)
@@ -101,19 +122,24 @@ def test_variant_4(printer):
 
 
 def test_variant_5(printer):
-    """Inverted colors"""
-    print("\n=== VARIANT 5: Inverted (white becomes black) ===")
-    printer.text("\n--- VARIANT 5: Inverted ---\n")
-    
+    """White background + No dithering (pure threshold)"""
+    print("\n=== VARIANT 5: White BG + No Dithering (threshold) ===")
+    printer.text("\n--- VARIANT 5: White BG + Threshold ---\n")
+
     image = Image.open(image_path)
+
+    # Handle transparency with WHITE background
+    if image.mode == 'RGBA':
+        background = Image.new('RGB', image.size, (255, 255, 255))
+        background.paste(image, mask=image.split()[3])
+        image = background
+
     image = image.convert("L")
-    
-    # Invert the image
-    from PIL import ImageOps
-    image = ImageOps.invert(image)
-    
     image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
-    image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)
+
+    # Convert to 1-bit WITHOUT dithering (pure threshold at 128)
+    image = image.point(lambda x: 0 if x < 128 else 255, '1')
+
     image = center_image(image, 384)
     printer.image(image)
     printer.text("\n")
