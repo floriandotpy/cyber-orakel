@@ -74,6 +74,12 @@ def print_receipt(message, zodiac):
     printer = None
     try:
         printer = Usb(VENDOR_ID, PRODUCT_ID, {}, out_ep=0x03)
+
+        # Set printer width BEFORE any operations
+        if 'media' not in printer.profile.profile_data:
+            printer.profile.profile_data['media'] = {}
+        if 'width' not in printer.profile.profile_data['media']:
+            printer.profile.profile_data['media']['width'] = {}
         printer.profile.profile_data['media']['width']['pixel'] = 384
 
         # Print header image
@@ -121,6 +127,7 @@ def print_receipt(message, zodiac):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Druckt eine Nachricht auf den Thermodrucker.")
     parser.add_argument("message", type=str, help="Die Nachricht, die gedruckt werden soll.")
+    parser.add_argument("--zodiac", type=str, default="unknown", help="Das Sternzeichen (optional)")
 
     args = parser.parse_args()
-    print_receipt(args.message)
+    print_receipt(args.message, args.zodiac)
