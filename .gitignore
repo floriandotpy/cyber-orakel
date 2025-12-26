@@ -4,3 +4,4 @@ __pycache__/
 *$py.class
 fortunes.db
 current_entropy.json
+.env
