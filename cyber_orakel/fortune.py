@@ -272,13 +272,28 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
                 entropy_words = json.load(f)
                 entropy_snippet = "\n".join([f"- {word}" for word in entropy_words])
 
-    prompt = f"""You are a fortune teller in a cyberpunk story.
-    Write a fortune cookie message for the cyber zodiac "{zodiac.display_name}"
-    with a sentiment of "{sentiment}". The message should be exactly {num_lines} lines long.
-    Write in {language}. Do not explain your answer. Be short and concise. Add no special characters.
-    The following terms and phrases are typical for the cyber zodiac {zodiac.display_name}.
-    Use them as inspiration for the message but don't just copy them verbatim:
-    {zodiac.prompt_snippet}\n{entropy_snippet}"""
+    prompt = f"""
+    Du bist ein Orakel in einer Cyber-Nerd-Welt und schreibst Glückskeks-Zettel für die/den Benutzer auf dem Chaos Computer Congress. 
+
+    Aufgabe:
+    - Schreibe GENAU {num_lines} Zeilen.
+    - Sprache: Deutsch.
+    - Jede Zeile ist ein ganzer Satz, kurz und prägnant.
+    - Kein Markdown, keine Bulletpoints, keine Emojis, keine ASCII-Art.
+    - Keine Erklärungen, kein "Hier ist dein Text:".
+
+    Wichtigstes Sternzeichen des Benutzers/Archetyp des Orakels (baue dies gerne mit ein!): {zodiac.display_name}
+    Stimmung: {sentiment}
+
+    Stil-Inspiration (kreativ einbauen, nicht unbedingt 1:1 kopieren):
+    {zodiac.prompt_snippet}
+
+    Zusätzliche Zufallswörter (wenn vorhanden, optional einbauen):
+    {entropy_snippet}
+
+    Gib NUR den Text aus, ohne Anführungszeichen.
+    """.strip()
+    
     # cleanup prompt: remove leading whitespace in every line and remove double line breaks
     prompt = "\n".join([line.strip() for line in prompt.split("\n")]).replace("\n\n", "\n")
     print(prompt)
@@ -292,6 +307,13 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     duration = time.time() - start_time
 
     fortune_text = response.content
+
+    # Print the generated fortune for debugging/testing
+    print("\n" + "="*50)
+    print("GENERATED FORTUNE:")
+    print("="*50)
+    print(fortune_text)
+    print("="*50 + "\n")
 
     # Log to database
     fortune_obj = Fortune(

@@ -191,15 +191,14 @@ class CyberOracleServer:
                 "Bill Gates",
                 "Portfreigabe",
                 "404",
-                "hacken",
-                "hacktivism",
                 "AI",
                 "LLM",
                 "Dieselgate",
                 "Dinogriller",
                 "Zukunft",
                 "Plüsch",
-                "Glitzer"
+                "Glitzer",
+                "Tu wat"
             ]
 
             # Get zodiac-specific words if zodiac is provided

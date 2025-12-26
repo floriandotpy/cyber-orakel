@@ -19,7 +19,7 @@
         </div>
       </div>
       <div id="step-2" class="hidden">
-        <h1 class="question">Hinterlasse Entropie für das Orakel nach dir</h1>
+        <h1 class="question">Hinterlasse noch Entropie für das Orakel <span class="highlight-pulse">nach dir</span></h1>
         <div id="step-2-content" class="grid">
           <!-- Select boxes will be dynamically added here -->
         </div>
@@ -53,8 +53,14 @@
       </div>
       <div id="step-qrcode" class="hidden">
         <h1 class="question">Scanne den QR-Code</h1>
-        <div class="text-center">
-          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 24%; height: auto;" />
+        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 2rem; margin: 1rem auto; max-width: 80%;">
+          <div style="flex: 0 0 auto;">
+            <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="width: 200px; height: auto;" />
+          </div>
+          <div style="flex: 1; text-align: left; font-size: 1.2rem; line-height: 1.6;">
+            <strong>Alternativ aktiviere dein Token händisch:</strong><br>
+            <code style="background: #fff; color: #000; padding: 0.5rem; display: inline-block; margin-top: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">wosg8zrb3nfcxzpkisoy</code>
+          </div>
         </div>
         <div class="text-center">
           <button id="qrcode-continue" class="button margin-top-small">
