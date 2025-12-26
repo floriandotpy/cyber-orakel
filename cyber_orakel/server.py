@@ -67,12 +67,24 @@ class CyberOracleServer:
 
             sentiment = random.choice(SENTIMENTS) if sentiment == "random" else sentiment
 
-            fortune_text = generate_fortune(zodiac, sentiment)
+            try:
+                fortune_text = generate_fortune(zodiac, sentiment)
+            except Exception as e:
+                print(f"Error generating fortune: {e}")
+                raise HTTPException(status_code=500, detail="Failed to generate fortune. Please try again.")
 
+            # Print receipt - don't fail if printer has issues
             if self.settings.enable_printer:
-                print_receipt(fortune_text, zodiac)
+                try:
+                    print_receipt(fortune_text, zodiac)
+                except Exception as e:
+                    print(f"Printer error (continuing anyway): {e}")
 
-            toot(fortune_text)
+            # Post to Mastodon - don't fail if network issues
+            try:
+                toot(fortune_text)
+            except Exception as e:
+                print(f"Mastodon error (continuing anyway): {e}")
 
             return {"fortune": fortune_text}
 

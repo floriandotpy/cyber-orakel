@@ -18,6 +18,22 @@ class CyberZodiac:
     prompt_snippet: str
 
 
+# Global ChatOllama instance - reused across requests but stateless (no chat history)
+# This prevents memory leaks from creating new instances for every fortune
+_chat_instance = None
+
+
+def get_chat_instance():
+    """Get or create the global ChatOllama instance."""
+    global _chat_instance
+    if _chat_instance is None:
+        _chat_instance = ChatOllama(
+            model="qwen2.5:1.5b",
+            timeout=30.0  # 30 second timeout for LLM responses
+        )
+    return _chat_instance
+
+
 SENTIMENTS = ["positive", "ecstatic", "optimistic", "dismal", "neutral", "mythical"]
 ZODIAC_SIGNS: list[CyberZodiac] = [
     CyberZodiac(
@@ -180,20 +196,27 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     Write a fortune cookie message for the cyber zodiac "{zodiac.display_name}"
     with a sentiment of "{sentiment}". The message should be exactly {num_lines} lines long.
     Write in {language}. Do not explain your answer. Be short and concise. Add no special characters.
-    The following terms and phrases are typical for the cyber zodiac {zodiac.display_name}. 
-    Use them as inspiration for the message but don't just copy them verbatim: 
+    The following terms and phrases are typical for the cyber zodiac {zodiac.display_name}.
+    Use them as inspiration for the message but don't just copy them verbatim:
     {zodiac.prompt_snippet}\n{entropy_snippet}"""
     # cleanup prompt: remove leading whitespace in every line and remove double line breaks
     prompt = "\n".join([line.strip() for line in prompt.split("\n")]).replace("\n\n", "\n")
     print(prompt)
 
+    # Get the reusable chat instance (no history, stateless)
+    chat = get_chat_instance()
+
+    # Generate fortune
     start_time = time.time()
-    chat = ChatOllama(model="qwen2.5:1.5b")
+    response = chat.invoke(prompt)
     duration = time.time() - start_time
 
+    fortune_text = response.content
+
+    # Log to database
     fortune_obj = Fortune(
         generation_time=datetime.now(),
-        fortune=chat.invoke(prompt).content,
+        fortune=fortune_text,
         prompt=prompt,
         generation_duration=duration,
         zodiac_key=zodiac_key,
@@ -201,8 +224,7 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     )
     log_to_sqlite(fortune_obj)
 
-    response = chat.invoke(prompt)
-    return response.content
+    return fortune_text
 
 
 def generate_many_fortunes():
