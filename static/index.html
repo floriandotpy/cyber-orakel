@@ -29,10 +29,6 @@
           </button>
         </div>
       </div>
-      <div id="loading" class="hidden">
-        <h1 class="question">Das Orakel cybert, bitte warten</h1>
-        <div class="loading-animation">CYBER IN PROGRESS...</div>
-      </div>
       <div id="step-badge" class="hidden">
         <h1 class="question">Möchtest du ein Cyber-Badge sammeln?</h1>
         <div class="text-center">
@@ -44,10 +40,14 @@
           </button>
         </div>
       </div>
+      <div id="loading" class="hidden">
+        <h1 class="question">Das Orakel cybert, bitte warten</h1>
+        <div class="loading-animation">CYBER IN PROGRESS...</div>
+      </div>
       <div id="step-qrcode" class="hidden">
         <h1 class="question">Scanne den QR-Code</h1>
         <div class="text-center">
-          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 80%; height: auto;" />
+          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 30%; height: auto;" />
         </div>
         <div class="text-center">
           <button id="qrcode-continue" class="button margin-top-small">
@@ -118,12 +118,25 @@
 
       function displayFortuneIfAvailableAndStepTwoCompleted() {
         if (fortune_text && step_2_completed) {
-          const loadingEl = document.getElementById("loading");
+          // Fortune is ready, check if we should show QR code or result
           const badgeEl = document.getElementById("step-badge");
+          const qrcodeEl = document.getElementById("step-qrcode");
+          const loadingEl = document.getElementById("loading");
 
-          // Show badge question instead of result
+          // If badge is visible, do nothing (user hasn't answered yet)
+          if (!badgeEl.classList.contains("hidden")) {
+            return;
+          }
+
+          // If QR code is visible, do nothing (user is scanning)
+          if (!qrcodeEl.classList.contains("hidden")) {
+            return;
+          }
+
+          // Otherwise show result
           loadingEl.classList.add("hidden");
-          badgeEl.classList.remove("hidden");
+          showResult();
+          startCountdown();
         }
       }
 
@@ -204,9 +217,9 @@
 
         step_2_completed = true;
 
-        // hide step-2 container and show loading
+        // hide step-2 and show badge question
         document.getElementById("step-2").classList.add("hidden");
-        document.getElementById("loading").classList.remove("hidden");
+        document.getElementById("step-badge").classList.remove("hidden");
 
         displayFortuneIfAvailableAndStepTwoCompleted();
       }
@@ -259,16 +272,22 @@
       document.getElementById("badge-yes").addEventListener("click", function () {
         document.getElementById("step-badge").classList.add("hidden");
         document.getElementById("step-qrcode").classList.remove("hidden");
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
       });
 
       document.getElementById("badge-no").addEventListener("click", function () {
-        showResult();
-        startCountdown();
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("loading").classList.remove("hidden");
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
       });
 
       document.getElementById("qrcode-continue").addEventListener("click", function () {
-        showResult();
-        startCountdown();
+        document.getElementById("step-qrcode").classList.add("hidden");
+        document.getElementById("loading").classList.remove("hidden");
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
       });
 
       document.getElementById("restart").addEventListener("click", function () {
