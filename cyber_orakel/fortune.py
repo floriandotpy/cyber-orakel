@@ -30,8 +30,11 @@ def get_chat_instance():
     global _chat_instance
     if _chat_instance is None:
         _chat_instance = ChatOllama(
-            model="gemma3:1b-it-qat",
-            timeout=30.0  # 30 second timeout for LLM responses
+            model="gemma3:4b-it-qat",
+            temperature=0.6,
+            top_p=0.9,
+            num_ctx=1024,   # NICHT höher!
+            timeout=30.0
         )
     return _chat_instance
 
