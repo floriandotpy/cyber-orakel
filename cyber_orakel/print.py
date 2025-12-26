@@ -108,9 +108,10 @@ def print_receipt(message, zodiac):
         printer.text("\n")
         # Print footer image
         image = Image.open(image_path_c3)
-        # Convert to black and white (same as header image)
-        image = image.convert("1")
+        # Convert to grayscale first, then to 1-bit with dithering for better quality
+        image = image.convert("L")  # Convert to grayscale
         image = image.resize((165, int(image.height * (165 / image.width))), Image.Resampling.LANCZOS)
+        image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)  # Convert to 1-bit with dithering
         image = center_image(image, 384)
         printer.image(image)
 
