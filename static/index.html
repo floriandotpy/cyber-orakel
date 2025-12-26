@@ -33,6 +33,28 @@
         <h1 class="question">Das Orakel cybert, bitte warten</h1>
         <div class="loading-animation">CYBER IN PROGRESS...</div>
       </div>
+      <div id="step-badge" class="hidden">
+        <h1 class="question">Möchtest du ein Cyber-Badge sammeln?</h1>
+        <div class="text-center">
+          <button id="badge-yes" class="button margin-top-small">
+            Ja
+          </button>
+          <button id="badge-no" class="button margin-top-small">
+            Nein, Danke
+          </button>
+        </div>
+      </div>
+      <div id="step-qrcode" class="hidden">
+        <h1 class="question">Scanne den QR-Code</h1>
+        <div class="text-center">
+          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 80%; height: auto;" />
+        </div>
+        <div class="text-center">
+          <button id="qrcode-continue" class="button margin-top-small">
+            Weiter
+          </button>
+        </div>
+      </div>
       <div id="result" class="hidden">
         <h1 class="question">Die Sterne haben gesprochen</h1>
         <p id="fortune-result" class="fortune-result">
@@ -97,15 +119,26 @@
       function displayFortuneIfAvailableAndStepTwoCompleted() {
         if (fortune_text && step_2_completed) {
           const loadingEl = document.getElementById("loading");
-          const resultEl = document.getElementById("result");
-          const restartEl = document.getElementById("restart");
-          //document.getElementById('fortune-result').innerText = fortune_text;
-          document.getElementById("fortune-result").innerText =
-            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+          const badgeEl = document.getElementById("step-badge");
+
+          // Show badge question instead of result
           loadingEl.classList.add("hidden");
-          resultEl.classList.remove("hidden");
-          restartEl.classList.remove("hidden");
+          badgeEl.classList.remove("hidden");
         }
+      }
+
+      function showResult() {
+        const badgeEl = document.getElementById("step-badge");
+        const qrcodeEl = document.getElementById("step-qrcode");
+        const resultEl = document.getElementById("result");
+        const restartEl = document.getElementById("restart");
+
+        document.getElementById("fortune-result").innerText =
+          "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+        badgeEl.classList.add("hidden");
+        qrcodeEl.classList.add("hidden");
+        resultEl.classList.remove("hidden");
+        restartEl.classList.remove("hidden");
       }
 
       async function fetchEntropyWords() {
@@ -216,28 +249,33 @@
         fortune_text = "";
         step_2_completed = false;
         document.getElementById("step-1").classList.remove("hidden");
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("step-qrcode").classList.add("hidden");
         document.getElementById("result").classList.add("hidden");
         fetchEntropyWords().then(renderEntropyWords);
       }
+
+      // Badge button handlers
+      document.getElementById("badge-yes").addEventListener("click", function () {
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("step-qrcode").classList.remove("hidden");
+      });
+
+      document.getElementById("badge-no").addEventListener("click", function () {
+        showResult();
+        startCountdown();
+      });
+
+      document.getElementById("qrcode-continue").addEventListener("click", function () {
+        showResult();
+        startCountdown();
+      });
 
       document.getElementById("restart").addEventListener("click", function () {
         restart();
       });
 
-      // Start the countdown when the result screen is shown
-      function displayFortuneIfAvailableAndStepTwoCompleted() {
-        if (fortune_text && step_2_completed) {
-          const loadingEl = document.getElementById("loading");
-          const resultEl = document.getElementById("result");
-          const restartEl = document.getElementById("restart");
-          document.getElementById("fortune-result").innerText =
-            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
-          loadingEl.classList.add("hidden");
-          resultEl.classList.remove("hidden");
-          restartEl.classList.remove("hidden");
-          startCountdown();
-        }
-      }
+
 
       // Fetch zodiacs and render buttons on page load
       fetchZodiacs().then(renderButtons);
