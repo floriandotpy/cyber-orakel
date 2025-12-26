@@ -23,10 +23,10 @@ Install Ollama (needed for running a local LLM)
 Fetch the following LLM. It's small and should run on current local machines all the way down to a Raspberry Pi 5.
 
 ```commandline
-ollama pull gemma2:2b
+ollama pull qwen2.5:1.5b
 
 # optional: try if the model runs properly
-ollama run gemma2:2b
+ollama run qwen2.5:1.5b
 ```
 
 

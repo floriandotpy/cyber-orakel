@@ -188,7 +188,7 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     print(prompt)
 
     start_time = time.time()
-    chat = ChatOllama(model="gemma2:2b")
+    chat = ChatOllama(model="qwen2.5:1.5b")
     duration = time.time() - start_time
 
     fortune_obj = Fortune(
