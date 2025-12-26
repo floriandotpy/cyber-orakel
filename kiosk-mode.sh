@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Setze Display für X11 (wichtig für Raspberry Pi)
+export DISPLAY=:0
+
 # Wechseln Sie in das Projektverzeichnis
 cd ~/Projects/cyber-orakel/
 
@@ -55,7 +58,24 @@ sleep 5
 
 # Starten Sie den Chromium-Browser im Kiosk-Modus
 echo "[$(date)] Starting Chromium in kiosk mode..." | tee -a "$LOG_FILE"
-chromium-browser --kiosk "http://localhost:8000" --noerrdialogs --disable-infobars --incognito --disable-features=TranslateUI --disable-pinch --overscroll-history-navigation=0 --hide-scrollbars --app="http://localhost:8000" --disable-infobars --no-cursor &
+chromium-browser --kiosk "http://localhost:8000" \
+  --noerrdialogs \
+  --disable-infobars \
+  --incognito \
+  --disable-features=TranslateUI \
+  --disable-pinch \
+  --overscroll-history-navigation=0 \
+  --hide-scrollbars \
+  --app="http://localhost:8000" \
+  --no-cursor \
+  --disable-background-networking \
+  --disable-sync \
+  --disable-default-apps \
+  --disable-extensions \
+  --no-first-run \
+  --no-default-browser-check \
+  --disable-logging \
+  --log-level=3 &
 CHROMIUM_PID=$!
 
 echo "Chromium PID: $CHROMIUM_PID" | tee -a "$LOG_FILE"
