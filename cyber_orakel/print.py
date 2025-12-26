@@ -13,7 +13,7 @@ PRODUCT_ID = 0x0289
 
 print_assets_path = Path(__file__).parent.parent / "print_assets"
 image_path_orakel = print_assets_path / "orakel_2.jpg"
-image_path_38c3 = print_assets_path / "38c3.png"
+image_path_c3 = print_assets_path / "39c3.png"
 
 MAX_WIDTH = 32
 
@@ -101,7 +101,7 @@ def print_receipt(message, zodiac):
         # printer.text(format_text(footer_text, MAX_WIDTH, center=True) + "\n")
         printer.text("\n")
         # Print footer image
-        image = Image.open(image_path_38c3)
+        image = Image.open(image_path_c3)
         image = image.resize((150, int(image.height * (150 / image.width))), Image.Resampling.LANCZOS)
         image = center_image(image, 384)
         printer.image(image)
