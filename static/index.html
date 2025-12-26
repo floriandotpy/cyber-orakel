@@ -46,7 +46,7 @@
           Oder hast einfach Lust mich auf einen Tschunk einzuladen?
         </p>
         <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0; font-weight: bold;">
-          👉 Dann ruf <span style="color: #00ff00;">8177</span> an oder frag am Assembly nach <span style="color: #00ff00;">Pablo</span>.
+          &rarr; Dann ruf <span style="color: #00ff00;">8177</span> an oder frag am Assembly nach <span style="color: #00ff00;">Pablo</span>.
         </p>
         <div class="text-center">
           <button id="help-back" class="button margin-top-small">
@@ -115,6 +115,13 @@
         <p id="fortune-result" class="fortune-result">
           <!-- Fortune will be dynamically added here-->
         </p>
+        <div class="text-center" style="margin-top: 2rem;">
+          <video autoplay loop muted playsinline style="max-width: 50%; height: auto;">
+            <source src="static/final_video.mp4" type="video/mp4">
+            <source src="static/final_video.mov" type="video/quicktime">
+            Dein Browser unterstützt das Video-Tag nicht.
+          </video>
+        </div>
         <div class="text-center">
           <button id="restart" class="button margin-top-small">
             Neu starten
@@ -234,7 +241,7 @@
         const restartEl = document.getElementById("restart");
 
         document.getElementById("fortune-result").innerText =
-          "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+          "Bitte mitnehmen.";
         badgeEl.classList.add("hidden");
         qrcodeEl.classList.add("hidden");
         resultEl.classList.remove("hidden");
