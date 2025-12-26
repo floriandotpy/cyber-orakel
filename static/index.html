@@ -79,13 +79,14 @@
       let fortune_text = "";
       let step_2_completed = false;
       let badgeCountdownInterval;
+      let selected_zodiac = null; // Store selected zodiac
 
       function restart() {
         fortune_text = "";
         step_2_completed = false;
+        selected_zodiac = null;
         document.getElementById("step-1").classList.remove("hidden");
         document.getElementById("result").classList.add("hidden");
-        fetchEntropyWords().then(renderEntropyWords);
       }
 
       async function fetchZodiacs() {
@@ -105,12 +106,16 @@
           button.innerText = zodiac.display_name;
           button.addEventListener("click", async function () {
             const sentiment = "random";
+            selected_zodiac = zodiac.key; // Store selected zodiac
 
             const loadingEl = document.getElementById("loading");
             const step2El = document.getElementById("step-2");
 
             document.getElementById("step-1").classList.add("hidden");
             step2El.classList.remove("hidden");
+
+            // Fetch entropy words for this zodiac
+            fetchEntropyWords(zodiac.key).then(renderEntropyWords);
 
             const response = await fetch(
               `${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`
@@ -162,8 +167,11 @@
         restartEl.classList.remove("hidden");
       }
 
-      async function fetchEntropyWords() {
-        const response = await fetch(`${serverUrl}/entropy_words`);
+      async function fetchEntropyWords(zodiac = null) {
+        const url = zodiac
+          ? `${serverUrl}/entropy_words?zodiac=${zodiac}`
+          : `${serverUrl}/entropy_words`;
+        const response = await fetch(url);
         const words = await response.json();
         return words;
       }

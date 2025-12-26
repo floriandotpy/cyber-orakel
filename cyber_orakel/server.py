@@ -93,8 +93,9 @@ class CyberOracleServer:
             return [{"key": zodiac.key, "display_name": zodiac.display_name} for zodiac in ZODIAC_SIGNS]
 
         @self.app.get("/entropy_words")
-        def get_entropy_words():
-            entropy_words = [
+        def get_entropy_words(zodiac: Optional[str] = None):
+            # General pool - available for all zodiacs
+            general_entropy_words = [
                 "Klimaschutz",
                 "Corona",
                 "Impfpflicht",
@@ -186,10 +187,41 @@ class CyberOracleServer:
                 "VoC",
                 "Vorratsdatenspeicherung",
                 "Wiki",
+                "Apple",
+                "Bill Gates",
+                "Portfreigabe",
+                "404",
+                "hacken",
+                "hacktivism",
+                "AI",
+                "LLM",
+                "Dieselgate",
+                "Dinogriller",
+                "Zukunft",
+                "Plüsch",
+                "Glitzer"
             ]
 
-            # pick 9 random words
-            return random.sample(entropy_words, 9)
+            # Get zodiac-specific words if zodiac is provided
+            zodiac_specific_words = []
+            if zodiac:
+                zodiac_obj = next((z for z in ZODIAC_SIGNS if z.key == zodiac), None)
+                if zodiac_obj and zodiac_obj.entropy_words:
+                    zodiac_specific_words = zodiac_obj.entropy_words
+
+            # Pick 2 from zodiac-specific pool (if available)
+            selected_specific = []
+            if zodiac_specific_words and len(zodiac_specific_words) >= 2:
+                selected_specific = random.sample(zodiac_specific_words, 2)
+
+            # Pick 7 from general pool
+            selected_general = random.sample(general_entropy_words, min(7, len(general_entropy_words)))
+
+            # Combine and shuffle (2 zodiac-specific + 7 general = 9 total)
+            all_words = selected_specific + selected_general
+            random.shuffle(all_words)
+
+            return all_words
 
         @self.app.post("/entropy")
         def save_entropy(data: dict):
