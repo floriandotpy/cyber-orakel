@@ -36,7 +36,7 @@
             Ja
           </button>
           <button id="badge-no" class="button margin-top-small">
-            Nein, Danke
+            Nein, Danke (10 Sekunden)
           </button>
         </div>
       </div>
@@ -47,7 +47,7 @@
       <div id="step-qrcode" class="hidden">
         <h1 class="question">Scanne den QR-Code</h1>
         <div class="text-center">
-          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 30%; height: auto;" />
+          <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="max-width: 27%; height: auto;" />
         </div>
         <div class="text-center">
           <button id="qrcode-continue" class="button margin-top-small">
@@ -71,6 +71,7 @@
       const serverUrl = "http://localhost:8000";
       let fortune_text = "";
       let step_2_completed = false;
+      let badgeCountdownInterval;
 
       function restart() {
         fortune_text = "";
@@ -221,6 +222,9 @@
         document.getElementById("step-2").classList.add("hidden");
         document.getElementById("step-badge").classList.remove("hidden");
 
+        // Start countdown for badge question
+        startBadgeCountdown();
+
         displayFortuneIfAvailableAndStepTwoCompleted();
       }
 
@@ -257,8 +261,26 @@
         }, 1000);
       }
 
+      function startBadgeCountdown() {
+        let countdown = 10; // seconds
+        const badgeNoButton = document.getElementById("badge-no");
+        badgeNoButton.innerText = `Nein, Danke (${countdown} Sekunden)`;
+
+        badgeCountdownInterval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            badgeNoButton.innerText = `Nein, Danke (${countdown} Sekunden)`;
+          } else {
+            clearInterval(badgeCountdownInterval);
+            // Automatically click "No"
+            badgeNoButton.click();
+          }
+        }, 1000);
+      }
+
       function restart() {
         clearInterval(countdownInterval);
+        clearInterval(badgeCountdownInterval);
         fortune_text = "";
         step_2_completed = false;
         document.getElementById("step-1").classList.remove("hidden");
@@ -270,6 +292,7 @@
 
       // Badge button handlers
       document.getElementById("badge-yes").addEventListener("click", function () {
+        clearInterval(badgeCountdownInterval);
         document.getElementById("step-badge").classList.add("hidden");
         document.getElementById("step-qrcode").classList.remove("hidden");
         // Check if fortune is already ready
@@ -277,6 +300,7 @@
       });
 
       document.getElementById("badge-no").addEventListener("click", function () {
+        clearInterval(badgeCountdownInterval);
         document.getElementById("step-badge").classList.add("hidden");
         document.getElementById("loading").classList.remove("hidden");
         // Check if fortune is already ready
