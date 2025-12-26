@@ -83,7 +83,7 @@
         </div>
       </div>
       <div id="loading" class="hidden">
-        <h1 class="question">Das Orakel cybert, bitte warten</h1>
+        <h1 class="question">Das Orakel cybert (lokal), bitte warten</h1>
         <div class="loading-animation">CYBER IN PROGRESS...</div>
         <div class="text-center" style="margin-top: 2rem;">
           <video autoplay loop muted playsinline style="max-width: 50%; height: auto;">
@@ -116,7 +116,7 @@
           <!-- Fortune will be dynamically added here-->
         </p>
         <div class="text-center" style="margin-top: 2rem;">
-          <video autoplay loop muted playsinline style="max-width: 50%; height: auto;">
+          <video autoplay loop muted playsinline style="max-width: 40%; height: auto;">
             <source src="static/final_video.mp4" type="video/mp4">
             <source src="static/final_video.mov" type="video/quicktime">
             Dein Browser unterstützt das Video-Tag nicht.
@@ -136,10 +136,36 @@
       let badgeCountdownInterval;
       let selected_zodiac = null; // Store selected zodiac
 
+      function disableCornerButtons() {
+        const languageBtn = document.getElementById("language-button");
+        const helpBtn = document.getElementById("help-button");
+        languageBtn.disabled = true;
+        helpBtn.disabled = true;
+        languageBtn.style.opacity = "0.5";
+        helpBtn.style.opacity = "0.5";
+        languageBtn.style.cursor = "not-allowed";
+        helpBtn.style.cursor = "not-allowed";
+      }
+
+      function enableCornerButtons() {
+        const languageBtn = document.getElementById("language-button");
+        const helpBtn = document.getElementById("help-button");
+        languageBtn.disabled = false;
+        helpBtn.disabled = false;
+        languageBtn.style.opacity = "1";
+        helpBtn.style.opacity = "1";
+        languageBtn.style.cursor = "pointer";
+        helpBtn.style.cursor = "pointer";
+      }
+
       function restart() {
         fortune_text = "";
         step_2_completed = false;
         selected_zodiac = null;
+
+        // Re-enable corner buttons on restart
+        enableCornerButtons();
+
         document.getElementById("step-1").classList.remove("hidden");
         document.getElementById("result").classList.add("hidden");
         document.getElementById("step-language").classList.add("hidden");
@@ -229,6 +255,10 @@
 
           // Otherwise show result
           loadingEl.classList.add("hidden");
+
+          // Re-enable corner buttons when loading is done
+          enableCornerButtons();
+
           showResult();
           startCountdown();
         }
@@ -405,6 +435,10 @@
         clearInterval(badgeCountdownInterval);
         document.getElementById("step-badge").classList.add("hidden");
         document.getElementById("loading").classList.remove("hidden");
+
+        // Disable corner buttons during loading
+        disableCornerButtons();
+
         // Check if fortune is already ready
         displayFortuneIfAvailableAndStepTwoCompleted();
       });
@@ -412,6 +446,10 @@
       document.getElementById("qrcode-continue").addEventListener("click", function () {
         document.getElementById("step-qrcode").classList.add("hidden");
         document.getElementById("loading").classList.remove("hidden");
+
+        // Disable corner buttons during loading
+        disableCornerButtons();
+
         // Check if fortune is already ready
         displayFortuneIfAvailableAndStepTwoCompleted();
       });
