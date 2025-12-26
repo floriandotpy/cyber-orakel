@@ -177,12 +177,13 @@ body {
 
 .fortune-result {
     display:block;
-    font-size: 1.75em;
+    font-size: 1.5em;
     line-height: 2.25em;
     min-width: 70%;
     width: 70%;
     margin: 0 auto;
     font-family: monospace;
+    text-align: center;
 }
 
 .text-center {
