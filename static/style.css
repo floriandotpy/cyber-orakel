@@ -29,6 +29,17 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: monospace;
+    position: relative;
+}
+
+.top-right-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
 }
 
 .logo {
@@ -129,6 +140,26 @@ body {
 .button:active {
     transform: translateY(1px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.button-small-corner {
+    padding: 10px 20px;
+    font-size: 0.95em;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    color: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.button-small-corner:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15));
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .question {

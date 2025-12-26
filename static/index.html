@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="static/loading.css" />
   </head>
   <body>
+    <div class="top-right-buttons">
+      <button id="language-button" class="button-small-corner">Choose Language</button>
+      <button id="help-button" class="button-small-corner">Call help</button>
+    </div>
     <div class="logo">
       <img src="static/logo.png" alt="Cyber Orakel Logo" />
     </div>
@@ -16,6 +20,38 @@
         <h1 class="question">Was ist dein Cyber-Sternzeichen?</h1>
         <div id="step-1-content" class="grid">
           <!-- Buttons will be dynamically added here -->
+        </div>
+      </div>
+      <div id="step-language" class="hidden">
+        <h1 class="question">Hi English friend!</h1>
+        <p style="font-size: 1.3rem; text-align: center; margin: 2rem 0; line-height: 1.8;">
+          Due to time constraints, the cyber oracle currently speaks German only.
+        </p>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0; font-weight: bold;">
+          Side quest unlocked: locate a nearby hacker to act as your live translator!
+        </p>
+        <div class="text-center">
+          <button id="challenge-accepted" class="button margin-top-small">
+            Challenge accepted
+          </button>
+        </div>
+      </div>
+      <div id="step-help" class="hidden">
+        <h1 class="question">Brauchst du Hilfe?</h1>
+        <p style="font-size: 1.2rem; text-align: left; margin: 2rem auto; line-height: 1.8; max-width: 600px;">
+          Der Drucker druckt nicht?<br>
+          Du hast die Hardware geschrottet?<br>
+          Eine Sicherheitslücke entdeckt?<br>
+          Du willst einfach mal in Ruhe mit jemandem sprechen?<br>
+          Oder hast einfach Lust mich auf einen Tschunk einzuladen?
+        </p>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0; font-weight: bold;">
+          👉 Dann ruf <span style="color: #00ff00;">8177</span> an oder frag am Assembly nach <span style="color: #00ff00;">Pablo</span>.
+        </p>
+        <div class="text-center">
+          <button id="help-back" class="button margin-top-small">
+            Zurück
+          </button>
         </div>
       </div>
       <div id="step-2" class="hidden">
@@ -28,6 +64,12 @@
             Entropie speichern
           </button>
         </div>
+      </div>
+      <div id="step-entropy-confirmation" class="hidden">
+        <h1 class="question">✓ Danke!</h1>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0;">
+          Deine Entropie wurde in der Ablage (P) abgelegt
+        </p>
       </div>
       <div id="step-badge" class="hidden">
         <h1 class="question">Möchtest du ein Cyber-Badge sammeln?</h1>
@@ -93,7 +135,33 @@
         selected_zodiac = null;
         document.getElementById("step-1").classList.remove("hidden");
         document.getElementById("result").classList.add("hidden");
+        document.getElementById("step-language").classList.add("hidden");
+        document.getElementById("step-help").classList.add("hidden");
       }
+
+      // Language button handler
+      document.getElementById("language-button").addEventListener("click", function() {
+        document.getElementById("step-1").classList.add("hidden");
+        document.getElementById("step-language").classList.remove("hidden");
+      });
+
+      // Challenge accepted button handler
+      document.getElementById("challenge-accepted").addEventListener("click", function() {
+        document.getElementById("step-language").classList.add("hidden");
+        document.getElementById("step-1").classList.remove("hidden");
+      });
+
+      // Help button handler
+      document.getElementById("help-button").addEventListener("click", function() {
+        document.getElementById("step-1").classList.add("hidden");
+        document.getElementById("step-help").classList.remove("hidden");
+      });
+
+      // Help back button handler
+      document.getElementById("help-back").addEventListener("click", function() {
+        document.getElementById("step-help").classList.add("hidden");
+        document.getElementById("step-1").classList.remove("hidden");
+      });
 
       async function fetchZodiacs() {
         const response = await fetch(`${serverUrl}/zodiacs`);
@@ -239,14 +307,20 @@
 
         step_2_completed = true;
 
-        // hide step-2 and show badge question
+        // hide step-2 and show confirmation
         document.getElementById("step-2").classList.add("hidden");
-        document.getElementById("step-badge").classList.remove("hidden");
+        document.getElementById("step-entropy-confirmation").classList.remove("hidden");
 
-        // Start countdown for badge question
-        startBadgeCountdown();
+        // Wait 3 seconds, then show badge question
+        setTimeout(() => {
+          document.getElementById("step-entropy-confirmation").classList.add("hidden");
+          document.getElementById("step-badge").classList.remove("hidden");
 
-        displayFortuneIfAvailableAndStepTwoCompleted();
+          // Start countdown for badge question
+          startBadgeCountdown();
+
+          displayFortuneIfAvailableAndStepTwoCompleted();
+        }, 3000);
       }
 
       function updateSubmitButton() {
