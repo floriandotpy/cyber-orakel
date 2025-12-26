@@ -1,0 +1,17 @@
+[Unit]
+Description=Cyber Orakel Kiosk Mode
+After=graphical.target network.target
+
+[Service]
+Type=simple
+User=pablo
+WorkingDirectory=/home/pablo/Projects/cyber-orakel
+Environment="DISPLAY=:0"
+Environment="XAUTHORITY=/home/pablo/.Xauthority"
+ExecStart=/home/pablo/Projects/cyber-orakel/kiosk-mode.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target
+

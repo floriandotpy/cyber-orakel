@@ -31,9 +31,10 @@ def get_chat_instance():
     if _chat_instance is None:
         _chat_instance = ChatOllama(
             model="gemma3:4b-it-qat",
+            max_tokens=60,
             temperature=0.6,
             top_p=0.9,
-            num_ctx=1024,   # NICHT höher!
+            num_ctx=512,   # NICHT höher!
             timeout=30.0
         )
     return _chat_instance
