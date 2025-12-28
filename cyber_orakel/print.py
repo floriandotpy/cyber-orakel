@@ -4,6 +4,7 @@ from escpos.printer import Usb
 from PIL import Image
 import textwrap
 import argparse  # Für externe Parameter (CLI)
+import time
 
 # USB-Daten des Druckers
 VENDOR_ID = 0x28e9
@@ -75,6 +76,10 @@ def print_receipt(message, zodiac):
     try:
         printer = Usb(VENDOR_ID, PRODUCT_ID, {}, out_ep=0x03)
 
+        # Reset printer to clear any stuck state
+        printer.hw("INIT")
+        time.sleep(0.2)  # Give printer time to reset
+
         # Set printer width BEFORE any operations
         if 'media' not in printer.profile.profile_data:
             printer.profile.profile_data['media'] = {}
@@ -87,6 +92,7 @@ def print_receipt(message, zodiac):
         image = image.convert("1")
         image = image.resize((384, int(image.height * (384 / image.width))), Image.Resampling.LANCZOS)
         printer.image(image)
+        time.sleep(0.1)  # Small delay after image
         printer.text("\n")
         printer.text("\n")
 
@@ -99,6 +105,7 @@ def print_receipt(message, zodiac):
         printer.text("\n")
         printer.text(format_text(message, MAX_WIDTH, center=True) + "\n")
         printer.text("\n")
+        time.sleep(0.1)  # Small delay before footer
 
         # FOOTER
         # Print footer text
@@ -121,16 +128,36 @@ def print_receipt(message, zodiac):
         image = image.convert("1", dither=Image.Dither.FLOYDSTEINBERG)
         image = center_image(image, 384)
         printer.image(image)
+        time.sleep(0.1)  # Small delay after footer image
 
         # Finalize print
+        printer.text("\n")  # Extra newline before cut
+        time.sleep(0.2)  # Wait before cutting
         printer.cut()
+
+        # Flush any remaining data
+        if hasattr(printer.device, 'flush'):
+            printer.device.flush()
+
         print("Print complete")
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error during print: {e}")
+        # Try to reset printer on error
+        try:
+            if printer:
+                printer.hw("INIT")
+                time.sleep(0.5)
+        except:
+            pass
     finally:
         if printer and printer.device:
-            printer.close()
+            try:
+                # Ensure clean shutdown
+                time.sleep(0.2)
+                printer.close()
+            except Exception as e:
+                print(f"Error closing printer: {e}")
 
 
 # Script can be run from the command line
