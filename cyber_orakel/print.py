@@ -131,7 +131,6 @@ def print_receipt(message, zodiac):
         time.sleep(0.1)  # Small delay after footer image
 
         # Finalize print
-        printer.text("\n")  # Extra newline before cut
         time.sleep(0.2)  # Wait before cutting
         printer.cut()
 
