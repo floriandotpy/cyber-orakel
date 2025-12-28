@@ -101,12 +101,12 @@
           </div>
           <div style="flex: 1; text-align: left; font-size: 1.2rem; line-height: 1.6;">
             <strong>Alternativ aktiviere dein Token händisch:</strong><br>
-            <code style="background: #fff; color: #000; padding: 0.5rem; display: inline-block; margin-top: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">wosg8zrb3nfcxzpkisoy</code>
+            <code style="background: #fff; color: #000; padding: 0.5rem; display: inline-block; margin: 0.5rem 0; border-radius: 4px; border: 1px solid #ccc;">wosg8zrb3nfcxzpkisoy</code>
           </div>
         </div>
         <div class="text-center">
           <button id="qrcode-continue" class="button margin-top-small">
-            Weiter
+            Weiter (<span id="qrcode-countdown">15</span>s)
           </button>
         </div>
       </div>
@@ -134,6 +134,7 @@
       let fortune_text = "";
       let step_2_completed = false;
       let badgeCountdownInterval;
+      let qrcodeCountdownInterval;
       let selected_zodiac = null; // Store selected zodiac
 
       function disableCornerButtons() {
@@ -410,9 +411,26 @@
         }, 1000);
       }
 
+      function startQRCodeCountdown() {
+        let countdown = 15; // seconds
+        const countdownSpan = document.getElementById("qrcode-countdown");
+
+        qrcodeCountdownInterval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            countdownSpan.innerText = countdown;
+          } else {
+            clearInterval(qrcodeCountdownInterval);
+            // Automatically click "Weiter"
+            document.getElementById("qrcode-continue").click();
+          }
+        }, 1000);
+      }
+
       function restart() {
         clearInterval(countdownInterval);
         clearInterval(badgeCountdownInterval);
+        clearInterval(qrcodeCountdownInterval);
         fortune_text = "";
         step_2_completed = false;
         document.getElementById("step-1").classList.remove("hidden");
@@ -427,6 +445,10 @@
         clearInterval(badgeCountdownInterval);
         document.getElementById("step-badge").classList.add("hidden");
         document.getElementById("step-qrcode").classList.remove("hidden");
+
+        // Start QR code countdown
+        startQRCodeCountdown();
+
         // Check if fortune is already ready
         displayFortuneIfAvailableAndStepTwoCompleted();
       });
@@ -444,6 +466,7 @@
       });
 
       document.getElementById("qrcode-continue").addEventListener("click", function () {
+        clearInterval(qrcodeCountdownInterval);
         document.getElementById("step-qrcode").classList.add("hidden");
         document.getElementById("loading").classList.remove("hidden");
 
