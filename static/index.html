@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="static/loading.css" />
   </head>
   <body>
+    <div class="top-right-buttons">
+      <button id="language-button" class="button-small-corner">Choose Language</button>
+      <button id="help-button" class="button-small-corner">Call help</button>
+    </div>
     <div class="logo">
       <img src="static/logo.png" alt="Cyber Orakel Logo" />
     </div>
@@ -18,8 +22,40 @@
           <!-- Buttons will be dynamically added here -->
         </div>
       </div>
+      <div id="step-language" class="hidden">
+        <h1 class="question">Hi English friend!</h1>
+        <p style="font-size: 1.3rem; text-align: center; margin: 2rem 0; line-height: 1.8;">
+          Due to time constraints, the cyber oracle currently speaks German only.
+        </p>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0; font-weight: bold;">
+          Side quest unlocked: locate a nearby hacker to act as your live translator!
+        </p>
+        <div class="text-center">
+          <button id="challenge-accepted" class="button margin-top-small">
+            Challenge accepted
+          </button>
+        </div>
+      </div>
+      <div id="step-help" class="hidden">
+        <h1 class="question">Brauchst du Hilfe?</h1>
+        <p style="font-size: 1.0rem; text-align: left; margin: 2rem auto; line-height: 1.8; max-width: 600px;">
+          Der Drucker druckt nicht?<br>
+          Du hast die Hardware geschrottet?<br>
+          Eine Sicherheitslücke entdeckt?<br>
+          Du willst einfach mal in Ruhe mit jemandem sprechen?<br>
+          Oder hast einfach Lust mich auf einen Tschunk einzuladen?
+        </p>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0; font-weight: bold;">
+          Dann ruf <span style="color: #00ff00;">8177</span> an oder frag am Assembly nach <span style="color: #00ff00;">Pablo</span>.
+        </p>
+        <div class="text-center">
+          <button id="help-back" class="button margin-top-small">
+            Zurück
+          </button>
+        </div>
+      </div>
       <div id="step-2" class="hidden">
-        <h1 class="question">Hinterlasse Entropie für das Orakel nach dir</h1>
+        <h1 class="question">Hinterlasse noch Entropie für das Orakel <span class="highlight-pulse">nach dir</span></h1>
         <div id="step-2-content" class="grid">
           <!-- Select boxes will be dynamically added here -->
         </div>
@@ -29,15 +65,63 @@
           </button>
         </div>
       </div>
+      <div id="step-entropy-confirmation" class="hidden">
+        <h1 class="question">✓ Danke!</h1>
+        <p style="font-size: 1.5rem; text-align: center; margin: 2rem 0;">
+          Deine Entropie wurde in der Ablage (P) abgelegt
+        </p>
+      </div>
+      <div id="step-badge" class="hidden">
+        <h1 class="question">Möchtest du ein Cyber-Badge sammeln?</h1>
+        <div class="text-center">
+          <button id="badge-yes" class="button margin-top-small">
+            Ja
+          </button>
+          <button id="badge-no" class="button margin-top-small">
+            Nein, Danke (10 Sekunden)
+          </button>
+        </div>
+      </div>
       <div id="loading" class="hidden">
-        <h1 class="question">Das Orakel cybert, bitte warten</h1>
+        <h1 class="question">Das Orakel cybert (lokal), bitte warten</h1>
         <div class="loading-animation">CYBER IN PROGRESS...</div>
+        <div class="text-center" style="margin-top: 2rem;">
+          <video autoplay loop muted playsinline style="max-width: 50%; height: auto;">
+            <source src="static/final_video.mp4" type="video/mp4">
+            <source src="static/final_video.mov" type="video/quicktime">
+            Dein Browser unterstützt das Video-Tag nicht.
+          </video>
+        </div>
+      </div>
+      <div id="step-qrcode" class="hidden">
+        <h1 class="question">Scanne den QR-Code</h1>
+        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 2rem; margin: 1rem auto; max-width: 80%;">
+          <div style="flex: 0 0 auto;">
+            <img src="static/39c3-qrcode.png" alt="39C3 QR Code" style="width: 200px; height: auto;" />
+          </div>
+          <div style="flex: 1; text-align: left; font-size: 1.2rem; line-height: 1.6;">
+            <strong>Alternativ aktiviere dein Token händisch:</strong><br>
+            <code style="background: #fff; color: #000; padding: 0.5rem; display: inline-block; margin: 0.5rem 0; border-radius: 4px; border: 1px solid #ccc;">wosg8zrb3nfcxzpkisoy</code>
+          </div>
+        </div>
+        <div class="text-center">
+          <button id="qrcode-continue" class="button margin-top-small">
+            Weiter (<span id="qrcode-countdown">15</span>s)
+          </button>
+        </div>
       </div>
       <div id="result" class="hidden">
         <h1 class="question">Die Sterne haben gesprochen</h1>
         <p id="fortune-result" class="fortune-result">
           <!-- Fortune will be dynamically added here-->
         </p>
+        <div class="text-center" style="margin-top: 2rem;">
+          <video autoplay loop muted playsinline style="max-width: 40%; height: auto;">
+            <source src="static/final_video.mp4" type="video/mp4">
+            <source src="static/final_video.mov" type="video/quicktime">
+            Dein Browser unterstützt das Video-Tag nicht.
+          </video>
+        </div>
         <div class="text-center">
           <button id="restart" class="button margin-top-small">
             Neu starten
@@ -49,14 +133,69 @@
       const serverUrl = "http://localhost:8000";
       let fortune_text = "";
       let step_2_completed = false;
+      let badgeCountdownInterval;
+      let qrcodeCountdownInterval;
+      let selected_zodiac = null; // Store selected zodiac
+
+      function disableCornerButtons() {
+        const languageBtn = document.getElementById("language-button");
+        const helpBtn = document.getElementById("help-button");
+        languageBtn.disabled = true;
+        helpBtn.disabled = true;
+        languageBtn.style.opacity = "0.5";
+        helpBtn.style.opacity = "0.5";
+        languageBtn.style.cursor = "not-allowed";
+        helpBtn.style.cursor = "not-allowed";
+      }
+
+      function enableCornerButtons() {
+        const languageBtn = document.getElementById("language-button");
+        const helpBtn = document.getElementById("help-button");
+        languageBtn.disabled = false;
+        helpBtn.disabled = false;
+        languageBtn.style.opacity = "1";
+        helpBtn.style.opacity = "1";
+        languageBtn.style.cursor = "pointer";
+        helpBtn.style.cursor = "pointer";
+      }
 
       function restart() {
         fortune_text = "";
         step_2_completed = false;
+        selected_zodiac = null;
+
+        // Re-enable corner buttons on restart
+        enableCornerButtons();
+
         document.getElementById("step-1").classList.remove("hidden");
         document.getElementById("result").classList.add("hidden");
-        fetchEntropyWords().then(renderEntropyWords);
+        document.getElementById("step-language").classList.add("hidden");
+        document.getElementById("step-help").classList.add("hidden");
       }
+
+      // Language button handler
+      document.getElementById("language-button").addEventListener("click", function() {
+        document.getElementById("step-1").classList.add("hidden");
+        document.getElementById("step-language").classList.remove("hidden");
+      });
+
+      // Challenge accepted button handler
+      document.getElementById("challenge-accepted").addEventListener("click", function() {
+        document.getElementById("step-language").classList.add("hidden");
+        document.getElementById("step-1").classList.remove("hidden");
+      });
+
+      // Help button handler
+      document.getElementById("help-button").addEventListener("click", function() {
+        document.getElementById("step-1").classList.add("hidden");
+        document.getElementById("step-help").classList.remove("hidden");
+      });
+
+      // Help back button handler
+      document.getElementById("help-back").addEventListener("click", function() {
+        document.getElementById("step-help").classList.add("hidden");
+        document.getElementById("step-1").classList.remove("hidden");
+      });
 
       async function fetchZodiacs() {
         const response = await fetch(`${serverUrl}/zodiacs`);
@@ -75,12 +214,16 @@
           button.innerText = zodiac.display_name;
           button.addEventListener("click", async function () {
             const sentiment = "random";
+            selected_zodiac = zodiac.key; // Store selected zodiac
 
             const loadingEl = document.getElementById("loading");
             const step2El = document.getElementById("step-2");
 
             document.getElementById("step-1").classList.add("hidden");
             step2El.classList.remove("hidden");
+
+            // Fetch entropy words for this zodiac
+            fetchEntropyWords(zodiac.key).then(renderEntropyWords);
 
             const response = await fetch(
               `${serverUrl}/fortune?zodiac=${zodiac.key}&sentiment=${sentiment}`
@@ -96,20 +239,51 @@
 
       function displayFortuneIfAvailableAndStepTwoCompleted() {
         if (fortune_text && step_2_completed) {
+          // Fortune is ready, check if we should show QR code or result
+          const badgeEl = document.getElementById("step-badge");
+          const qrcodeEl = document.getElementById("step-qrcode");
           const loadingEl = document.getElementById("loading");
-          const resultEl = document.getElementById("result");
-          const restartEl = document.getElementById("restart");
-          //document.getElementById('fortune-result').innerText = fortune_text;
-          document.getElementById("fortune-result").innerText =
-            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
+
+          // If badge is visible, do nothing (user hasn't answered yet)
+          if (!badgeEl.classList.contains("hidden")) {
+            return;
+          }
+
+          // If QR code is visible, do nothing (user is scanning)
+          if (!qrcodeEl.classList.contains("hidden")) {
+            return;
+          }
+
+          // Otherwise show result
           loadingEl.classList.add("hidden");
-          resultEl.classList.remove("hidden");
-          restartEl.classList.remove("hidden");
+
+          // Re-enable corner buttons when loading is done
+          enableCornerButtons();
+
+          showResult();
+          startCountdown();
         }
       }
 
-      async function fetchEntropyWords() {
-        const response = await fetch(`${serverUrl}/entropy_words`);
+      function showResult() {
+        const badgeEl = document.getElementById("step-badge");
+        const qrcodeEl = document.getElementById("step-qrcode");
+        const resultEl = document.getElementById("result");
+        const restartEl = document.getElementById("restart");
+
+        document.getElementById("fortune-result").innerText =
+          "Bitte vorsichtig nach oben abziehen.";
+        badgeEl.classList.add("hidden");
+        qrcodeEl.classList.add("hidden");
+        resultEl.classList.remove("hidden");
+        restartEl.classList.remove("hidden");
+      }
+
+      async function fetchEntropyWords(zodiac = null) {
+        const url = zodiac
+          ? `${serverUrl}/entropy_words?zodiac=${zodiac}`
+          : `${serverUrl}/entropy_words`;
+        const response = await fetch(url);
         const words = await response.json();
         return words;
       }
@@ -171,11 +345,20 @@
 
         step_2_completed = true;
 
-        // hide step-2 container and show loading
+        // hide step-2 and show confirmation
         document.getElementById("step-2").classList.add("hidden");
-        document.getElementById("loading").classList.remove("hidden");
+        document.getElementById("step-entropy-confirmation").classList.remove("hidden");
 
-        displayFortuneIfAvailableAndStepTwoCompleted();
+        // Wait 3 seconds, then show badge question
+        setTimeout(() => {
+          document.getElementById("step-entropy-confirmation").classList.add("hidden");
+          document.getElementById("step-badge").classList.remove("hidden");
+
+          // Start countdown for badge question
+          startBadgeCountdown();
+
+          displayFortuneIfAvailableAndStepTwoCompleted();
+        }, 3000);
       }
 
       function updateSubmitButton() {
@@ -211,33 +394,94 @@
         }, 1000);
       }
 
+      function startBadgeCountdown() {
+        let countdown = 10; // seconds
+        const badgeNoButton = document.getElementById("badge-no");
+        badgeNoButton.innerText = `Nein, Danke (${countdown} Sekunden)`;
+
+        badgeCountdownInterval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            badgeNoButton.innerText = `Nein, Danke (${countdown} Sekunden)`;
+          } else {
+            clearInterval(badgeCountdownInterval);
+            // Automatically click "No"
+            badgeNoButton.click();
+          }
+        }, 1000);
+      }
+
+      function startQRCodeCountdown() {
+        let countdown = 15; // seconds
+        const countdownSpan = document.getElementById("qrcode-countdown");
+
+        qrcodeCountdownInterval = setInterval(() => {
+          countdown -= 1;
+          if (countdown > 0) {
+            countdownSpan.innerText = countdown;
+          } else {
+            clearInterval(qrcodeCountdownInterval);
+            // Automatically click "Weiter"
+            document.getElementById("qrcode-continue").click();
+          }
+        }, 1000);
+      }
+
       function restart() {
         clearInterval(countdownInterval);
+        clearInterval(badgeCountdownInterval);
+        clearInterval(qrcodeCountdownInterval);
         fortune_text = "";
         step_2_completed = false;
         document.getElementById("step-1").classList.remove("hidden");
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("step-qrcode").classList.add("hidden");
         document.getElementById("result").classList.add("hidden");
         fetchEntropyWords().then(renderEntropyWords);
       }
+
+      // Badge button handlers
+      document.getElementById("badge-yes").addEventListener("click", function () {
+        clearInterval(badgeCountdownInterval);
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("step-qrcode").classList.remove("hidden");
+
+        // Start QR code countdown
+        startQRCodeCountdown();
+
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
+      });
+
+      document.getElementById("badge-no").addEventListener("click", function () {
+        clearInterval(badgeCountdownInterval);
+        document.getElementById("step-badge").classList.add("hidden");
+        document.getElementById("loading").classList.remove("hidden");
+
+        // Disable corner buttons during loading
+        disableCornerButtons();
+
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
+      });
+
+      document.getElementById("qrcode-continue").addEventListener("click", function () {
+        clearInterval(qrcodeCountdownInterval);
+        document.getElementById("step-qrcode").classList.add("hidden");
+        document.getElementById("loading").classList.remove("hidden");
+
+        // Disable corner buttons during loading
+        disableCornerButtons();
+
+        // Check if fortune is already ready
+        displayFortuneIfAvailableAndStepTwoCompleted();
+      });
 
       document.getElementById("restart").addEventListener("click", function () {
         restart();
       });
 
-      // Start the countdown when the result screen is shown
-      function displayFortuneIfAvailableAndStepTwoCompleted() {
-        if (fortune_text && step_2_completed) {
-          const loadingEl = document.getElementById("loading");
-          const resultEl = document.getElementById("result");
-          const restartEl = document.getElementById("restart");
-          document.getElementById("fortune-result").innerText =
-            "Deine Prophezeiung wurde gedruckt. Bitte mitnehmen.";
-          loadingEl.classList.add("hidden");
-          resultEl.classList.remove("hidden");
-          restartEl.classList.remove("hidden");
-          startCountdown();
-        }
-      }
+
 
       // Fetch zodiacs and render buttons on page load
       fetchZodiacs().then(renderButtons);

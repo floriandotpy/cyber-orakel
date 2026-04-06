@@ -1,9 +1,10 @@
 import json
 import random
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from langchain_ollama import ChatOllama
 
@@ -16,6 +17,27 @@ class CyberZodiac:
     key: str
     display_name: str
     prompt_snippet: str
+    entropy_words: Optional[list[str]] = field(default_factory=lambda: None)  # Zodiac-specific entropy words
+
+
+# Global ChatOllama instance - reused across requests but stateless (no chat history)
+# This prevents memory leaks from creating new instances for every fortune
+_chat_instance = None
+
+
+def get_chat_instance():
+    """Get or create the global ChatOllama instance."""
+    global _chat_instance
+    if _chat_instance is None:
+        _chat_instance = ChatOllama(
+            model="gemma3:4b-it-qat",
+            max_tokens=60,
+            temperature=0.6,
+            top_p=0.9,
+            num_ctx=512,   # NICHT höher!
+            timeout=30.0
+        )
+    return _chat_instance
 
 
 SENTIMENTS = ["positive", "ecstatic", "optimistic", "dismal", "neutral", "mythical"]
@@ -37,7 +59,15 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Intrusion
         - Virus
         - Antivirus
-        """),
+        """,
+        entropy_words=[
+            "Firewall",
+            "Exploit",
+            "Zero-Day",
+            "Penetration Test",
+            "Backdoor",
+            "Rootkit",
+        ]),
     CyberZodiac(
         key="wissensanarcho",
         display_name="Wissensanarcho",
@@ -52,7 +82,15 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Wissen teilen
         - Wissen ist frei
         - Creative Commons
-        """),
+        """,
+        entropy_words=[
+            "Wikileaks",
+            "Tor Browser",
+            "VPN",
+            "Edward Snowden",
+            "Informationsfreiheit",
+            "Transparenz",
+        ]),
     CyberZodiac(
         key="einhorn",
         display_name="Einhorn",
@@ -71,7 +109,16 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Lötkolben
         - Lichterkette
         - Blinkende Lichter
-        """),
+        """,
+        entropy_words=[
+            "Glitzerstaub",
+            "Regenbogenfarben",
+            "Herzchen",
+            "Sternchen",
+            "Ponyhof",
+            "Zauber",
+            "Liebe"
+        ]),
     CyberZodiac(
         key="cryptogeek",
         display_name="Cryptogeek",
@@ -84,7 +131,15 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - GPG Key
         - https everywhere
         - Private Daten schützen, öffentliche Daten nützen
-        """),
+        """,
+        entropy_words=[
+            "AES-256",
+            "RSA",
+            "Hash",
+            "Signatur",
+            "Zertifikat",
+            "End-to-End",
+        ]),
     CyberZodiac(
         key="codeglaeubig",
         display_name="Codegläubig",
@@ -93,12 +148,22 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Alles ist 1 außer der 0
         - Code ist Poesie
         - Code ist Kunst
+        - Wer Vibe Coded lügt
         - Code hat immer Recht
         - Misstraue Autoritäten
         - Computer können dein Leben zum Besseren verändern
         - Der Code ist mit dir
         - Code ist Schönheit
-        """),
+        """,
+        entropy_words=[
+            "Git",
+            "Commit",
+            "Pull Request",
+            "Refactoring",
+            "Clean Code",
+            "Debugging",
+            "Vibe Coding"
+        ]),
     CyberZodiac(
         key="schwurbler",
         display_name="Schwurbler",
@@ -113,7 +178,16 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Bill Gates
         - Flat earther
         - Impfgegner
-        """),
+        """,
+        entropy_words=[
+            "Echsenmenschen",
+            "Illuminati",
+            "Neue Weltordnung",
+            "Reptiloiden",
+            "Mondlandung",
+            "Hohlwelt",
+            "Flat Earth"
+        ]),
     CyberZodiac(
         key="retrohacker",
         display_name="Retrohacker",
@@ -129,7 +203,16 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Atari
         - Lötkolben
         - Löten
-        """),
+        """,
+        entropy_words=[
+            "Floppy Disk",
+            "Modem",
+            "CD",
+            "Bitte 8-Bit",
+            "ASCII Art",
+            "Chiptune",
+            "Pixelart",
+        ]),
     CyberZodiac(
         key="datenelch",
         display_name="Datenelch",
@@ -142,7 +225,16 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Datenautobahn
         - Logbuch Netzpolitik
         - Neuland
-        """),
+        """,
+        entropy_words=[
+            "Glasfaser",
+            "Breitband",
+            "Ping",
+            "Latenz",
+            "Bandbreite",
+            "Router",
+            "Große Elchwanderung"
+        ]),
     CyberZodiac(
         key="tschunky",
         display_name="Tschunky",
@@ -157,7 +249,15 @@ ZODIAC_SIGNS: list[CyberZodiac] = [
         - Tschunk o'clock
         - Ohne Tschunk kein Leben
         - Ein Leben ohne Tschunk ist möglich, aber sinnlos
-        """)
+        """,
+        entropy_words=[
+            "Club-Mate",
+            "Flora Power",
+            "Rum",
+            "Brauner Zucker",
+            "Minze",
+            "Eiswürfel",
+        ])
 ]
 
 
@@ -176,24 +276,53 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
                 entropy_words = json.load(f)
                 entropy_snippet = "\n".join([f"- {word}" for word in entropy_words])
 
-    prompt = f"""You are a fortune teller in a cyberpunk story.
-    Write a fortune cookie message for the cyber zodiac "{zodiac.display_name}"
-    with a sentiment of "{sentiment}". The message should be exactly {num_lines} lines long.
-    Write in {language}. Do not explain your answer. Be short and concise. Add no special characters.
-    The following terms and phrases are typical for the cyber zodiac {zodiac.display_name}. 
-    Use them as inspiration for the message but don't just copy them verbatim: 
-    {zodiac.prompt_snippet}\n{entropy_snippet}"""
+    prompt = f"""
+    Du bist ein Orakel in einer Cyber-Nerd-Welt und schreibst Glückskeks-Zettel für die/den Benutzer auf dem Chaos Computer Congress. 
+
+    Aufgabe:
+    - Schreibe GENAU {num_lines} Zeilen.
+    - Sprache: Deutsch.
+    - Jede Zeile ist ein ganzer Satz, kurz und prägnant.
+    - Kein Markdown, keine Bulletpoints, keine Emojis, keine ASCII-Art.
+    - Keine Erklärungen, kein "Hier ist dein Text:".
+
+    Wichtigstes Sternzeichen des Benutzers/Archetyp des Orakels (baue dies gerne mit ein!): {zodiac.display_name}
+    Stimmung: {sentiment}
+
+    Stil-Inspiration (kreativ einbauen, nicht unbedingt 1:1 kopieren):
+    {zodiac.prompt_snippet}
+
+    Zusätzliche Zufallswörter (wenn vorhanden, optional einbauen):
+    {entropy_snippet}
+
+    Gib NUR den Text aus, ohne Anführungszeichen.
+    """.strip()
+    
     # cleanup prompt: remove leading whitespace in every line and remove double line breaks
     prompt = "\n".join([line.strip() for line in prompt.split("\n")]).replace("\n\n", "\n")
     print(prompt)
 
+    # Get the reusable chat instance (no history, stateless)
+    chat = get_chat_instance()
+
+    # Generate fortune
     start_time = time.time()
-    chat = ChatOllama(model="gemma2:2b")
+    response = chat.invoke(prompt)
     duration = time.time() - start_time
 
+    fortune_text = response.content
+
+    # Print the generated fortune for debugging/testing
+    print("\n" + "="*50)
+    print("GENERATED FORTUNE:")
+    print("="*50)
+    print(fortune_text)
+    print("="*50 + "\n")
+
+    # Log to database
     fortune_obj = Fortune(
         generation_time=datetime.now(),
-        fortune=chat.invoke(prompt).content,
+        fortune=fortune_text,
         prompt=prompt,
         generation_duration=duration,
         zodiac_key=zodiac_key,
@@ -201,8 +330,7 @@ def generate_fortune(zodiac_key: str, sentiment: str, num_lines: int = 2, langua
     )
     log_to_sqlite(fortune_obj)
 
-    response = chat.invoke(prompt)
-    return response.content
+    return fortune_text
 
 
 def generate_many_fortunes():
